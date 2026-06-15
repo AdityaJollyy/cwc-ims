@@ -31,7 +31,7 @@ const EmployeesPage = () => {
   const [filters, setFilters] = useState({
     search: '',
     division: '',
-    status: '',
+    is_archived: '',
     page: 1,
     limit: 25,
   })
@@ -85,7 +85,7 @@ const EmployeesPage = () => {
     { key: 'division', header: 'Division' },
     { key: 'designation', header: 'Designation' },
     {
-      key: 'assignment_count',
+      key: 'assigned_count',
       header: 'Equipment',
       render: (v) => (
         <span className={[
@@ -158,17 +158,17 @@ const EmployeesPage = () => {
         />
         <Select
           placeholder="All Status"
-          value={filters.status}
-          onChange={(e) => setFilter('status', e.target.value)}
+          value={filters.is_archived}
+          onChange={(e) => setFilter('is_archived', e.target.value)}
           options={[
-            { value: 'active', label: 'Active' },
-            { value: 'archived', label: 'Archived' },
+            { value: 'false', label: 'Active' },
+            { value: 'true', label: 'Archived' },
           ]}
           className="w-36"
         />
-        {(filters.search || filters.division || filters.status) && (
+        {(filters.search || filters.division || filters.is_archived) && (
           <button
-            onClick={() => setFilters({ search: '', division: '', status: '', page: 1, limit: 25 })}
+            onClick={() => setFilters({ search: '', division: '', is_archived: '', page: 1, limit: 25 })}
             className="text-sm text-slate-500 hover:text-slate-700 hover:underline transition-colors"
           >
             Clear filters
@@ -181,7 +181,7 @@ const EmployeesPage = () => {
         <div className="rounded-xl border border-slate-200 bg-white">
           <EmptyState
             title="No employees found"
-            message={filters.search || filters.division || filters.status
+            message={filters.search || filters.division || filters.is_archived
               ? 'Try adjusting your filters'
               : 'Add your first employee to get started'}
             action={

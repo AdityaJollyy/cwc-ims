@@ -18,13 +18,15 @@ const { buildSearchClause } = require('../utils/pagination');
  * @param {number} params.offset
  * @returns {{ rows: Object[], total: number }}
  */
-const findAll = async ({ search, division, designation, is_archived = false, limit, offset }) => {
+const findAll = async ({ search, division, designation, is_archived, limit, offset }) => {
   const conditions = [];
   const params = [];
 
-  // Always filter by archive status
-  params.push(is_archived);
-  conditions.push(`e.is_archived = $${params.length}`);
+  // Filter by archive status only when explicitly provided (undefined = show all)
+  if (is_archived !== undefined) {
+    params.push(is_archived);
+    conditions.push(`e.is_archived = $${params.length}`);
+  }
 
   // Full-text search across multiple columns
   if (search && search.trim()) {
@@ -171,6 +173,14 @@ const archive = async (id, is_archived) => {
 };
 
 /**
+ * Delete all assignment records for an employee (cascade helper — no ON DELETE CASCADE in schema)
+ * @param {string} employeeId - UUID
+ */
+const deleteAssignmentsByEmployeeId = async (employeeId) => {
+  await query(`DELETE FROM assignments WHERE employee_id = $1`, [employeeId]);
+};
+
+/**
  * Permanently delete an employee record
  * Cascade deletes will handle assignment history (via FK ON DELETE CASCADE
  * on the assignments table is not set, so we check manually)
@@ -195,7 +205,7 @@ const getAssignments = async (employeeId) => {
   const result = await query(
     `SELECT
       a.*,
-      ast.asset_id,
+      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
       ast.serial_number,
@@ -220,7 +230,7 @@ const getHistory = async (employeeId) => {
   const result = await query(
     `SELECT
       a.*,
-      ast.asset_id,
+      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
       ast.serial_number,
@@ -271,6 +281,7 @@ module.exports = {
   create,
   update,
   archive,
+  deleteAssignmentsByEmployeeId,
   deleteEmployee,
   getAssignments,
   getHistory,

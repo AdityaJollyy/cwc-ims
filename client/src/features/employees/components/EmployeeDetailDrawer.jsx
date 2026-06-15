@@ -50,6 +50,28 @@ const EmployeeDetailDrawer = ({ employee, isOpen, onClose, onUpdate }) => {
     onError: (err) => toast.error(err.response?.data?.message || 'Failed to update employee'),
   })
 
+  const archiveMutation = useMutation({
+    mutationFn: () => employeeApi.archive(employee.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] })
+      toast.success('Employee archived successfully')
+      onUpdate?.()
+      onClose()
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Failed to archive employee'),
+  })
+
+  const unarchiveMutation = useMutation({
+    mutationFn: () => employeeApi.unarchive(employee.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] })
+      toast.success('Employee unarchived successfully')
+      onUpdate?.()
+      onClose()
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Failed to unarchive employee'),
+  })
+
   const deleteMutation = useMutation({
     mutationFn: () => employeeApi.delete(employee.id),
     onSuccess: () => {
@@ -114,9 +136,32 @@ const EmployeeDetailDrawer = ({ employee, isOpen, onClose, onUpdate }) => {
             >
               Delete
             </Button>
-            <Button size="sm" onClick={() => setEditOpen(true)}>
-              Edit Employee
-            </Button>
+            <div className="flex gap-2">
+              {employee.is_archived ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  loading={unarchiveMutation.isPending}
+                  onClick={() => unarchiveMutation.mutate()}
+                >
+                  Unarchive
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={hasActiveAssignments}
+                  title={hasActiveAssignments ? `Return ${employee.assigned_count} asset(s) before archiving` : 'Archive employee'}
+                  loading={archiveMutation.isPending}
+                  onClick={() => archiveMutation.mutate()}
+                >
+                  Archive
+                </Button>
+              )}
+              <Button size="sm" onClick={() => setEditOpen(true)}>
+                Edit Employee
+              </Button>
+            </div>
           </>
         }
       >

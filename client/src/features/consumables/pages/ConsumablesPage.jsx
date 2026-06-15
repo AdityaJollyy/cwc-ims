@@ -212,7 +212,11 @@ const ConsumableDetailDrawer = ({ isOpen, onClose, consumable, onUpdated }) => {
         onConfirm={() => deleteMutation.mutate()}
         loading={deleteMutation.isPending}
         title="Delete Consumable?"
-        message={`This will permanently delete "${consumable.name}" and all its stock history. This action cannot be undone.`}
+        message={
+          consumable.current_stock > 0
+            ? `⚠️ "${consumable.name}" currently has ${consumable.current_stock} unit(s) in stock (${available} available, ${consumable.damaged_quantity} damaged). Deleting this will permanently remove all stock data and transaction history. This cannot be undone.`
+            : `This will permanently delete "${consumable.name}" and all its stock history. This action cannot be undone.`
+        }
         confirmLabel="Delete Permanently"
         confirmVariant="danger"
       />

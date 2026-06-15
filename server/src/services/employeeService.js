@@ -12,13 +12,21 @@ const getAll = async (queryParams) => {
   const { page, limit, offset } = parsePagination(queryParams);
   const { search, division, designation, is_archived } = queryParams;
 
-  const isArchivedBool = is_archived === 'true';
+  // Three-state filter: undefined/'' = show all, 'true' = archived only, 'false' = active only
+  let isArchivedFilter;
+  if (is_archived === 'true') {
+    isArchivedFilter = true;
+  } else if (is_archived === 'false') {
+    isArchivedFilter = false;
+  } else {
+    isArchivedFilter = undefined; // show all
+  }
 
   const { rows, total } = await employeeRepository.findAll({
     search,
     division,
     designation,
-    is_archived: isArchivedBool,
+    is_archived: isArchivedFilter,
     limit,
     offset,
   });
@@ -119,6 +127,8 @@ const deleteEmployee = async (id) => {
       `Cannot delete this employee — they currently have ${employee.assigned_count} asset(s) assigned. Please return all assets first.`
     );
   }
+  // Delete related assignment records first (no ON DELETE CASCADE on assignments table)
+  await employeeRepository.deleteAssignmentsByEmployeeId(id);
   await employeeRepository.deleteEmployee(id);
   return true;
 };

@@ -222,7 +222,7 @@ const AssignmentsPage = () => {
     { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium text-slate-800">{v}</p><p className="text-xs text-slate-400">{r.employee_code}</p></div> },
     { key: 'asset_code', header: 'Asset', render: (v, r) => <div><p className="font-mono text-xs font-medium text-indigo-600">{v}</p><p className="text-xs text-slate-500">{r.product_name || r.category_name}</p></div> },
     { key: 'assigned_at', header: 'Assigned Date', render: (v) => formatDate(v) },
-    { key: 'assigned_at', header: 'Days Active', render: (v) => <span className="font-medium">{getDaysActive(v)}d</span> },
+    { key: 'days_active', header: 'Days Active', render: (_, row) => <span className="font-medium">{getDaysActive(row.assigned_at)}d</span> },
     {
       key: 'actions', header: '', width: '80px',
       render: (_, row) => (

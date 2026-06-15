@@ -21,10 +21,13 @@ const errorHandler = (err, req, res, next) => {
     error = ApiError.conflict('A record with this value already exists');
   } else if (err.code === '23503') {
     // Foreign key violation
-    error = ApiError.badRequest('Referenced record does not exist');
+    error = ApiError.conflict('Cannot delete — this record is referenced by related data');
   } else if (err.code === '23502') {
     // Not null violation
     error = ApiError.badRequest('Required field is missing');
+  } else if (err.code === '22P02') {
+    // Invalid text representation (e.g., bad UUID format)
+    error = ApiError.badRequest('Invalid ID format');
   }
 
   // Handle JWT errors

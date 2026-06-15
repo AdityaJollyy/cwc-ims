@@ -81,6 +81,8 @@ const deleteAsset = async (id) => {
       `Cannot delete this asset — it is currently assigned. Please return it first.`
     );
   }
+  // Delete related assignment records first (no ON DELETE CASCADE on assignments table)
+  await assetRepository.deleteAssignmentsByAssetId(id);
   await assetRepository.deleteAsset(id);
   return true;
 };

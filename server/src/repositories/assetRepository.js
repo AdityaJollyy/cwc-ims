@@ -156,6 +156,14 @@ const updateStatus = async (id, status) => {
 };
 
 /**
+ * Delete all assignment records for an asset (cascade helper — no ON DELETE CASCADE in schema)
+ * @param {string} assetId - UUID
+ */
+const deleteAssignmentsByAssetId = async (assetId) => {
+  await query(`DELETE FROM assignments WHERE asset_id = $1`, [assetId]);
+};
+
+/**
  * Permanently delete an asset
  * @param {string} id - UUID
  * @returns {boolean}
@@ -168,5 +176,5 @@ const deleteAsset = async (id) => {
   return result.rows.length > 0;
 };
 
-module.exports = { findAll, findById, findByAssetId, create, update, updateStatus, deleteAsset };
+module.exports = { findAll, findById, findByAssetId, create, update, updateStatus, deleteAssignmentsByAssetId, deleteAsset };
 

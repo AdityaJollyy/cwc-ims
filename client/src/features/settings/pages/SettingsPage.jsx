@@ -78,11 +78,11 @@ const SettingsPage = () => {
     },
     { key: 'role', header: 'Role', render: (v) => <Badge status={v} /> },
     {
-      key: 'role', header: 'Change Role', render: (v, r) => {
+      key: 'role_action', header: 'Change Role', render: (_, r) => {
         if (r.id === currentUser?.id) return <span className="text-xs text-slate-400">Current user</span>
         return (
           <select
-            defaultValue={v}
+            defaultValue={r.role}
             onChange={(e) => updateRoleMutation.mutate({ id: r.id, role: e.target.value })}
             className="h-7 pl-2 pr-6 rounded-lg border border-slate-200 text-xs bg-white outline-none cursor-pointer appearance-none"
           >
