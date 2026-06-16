@@ -10,7 +10,6 @@ import Select from '../../../components/ui/Select'
 import { Spinner } from '../../../components/ui/Loader'
 
 const schema = z.object({
-  asset_id: z.string().min(1, 'Asset ID is required'),
   category_id: z.string().min(1, 'Category is required'),
   product_name: z.string().optional(),
   model: z.string().optional(),
@@ -103,36 +102,25 @@ const AssetForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
 
   return (
     <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      {/* Asset ID — required, unique, admin-entered */}
-      <div className="grid grid-cols-2 gap-4">
-        <Input
-          label="Asset ID"
-          placeholder="e.g. LAP-001, PC2024-05, PR-IT-03"
-          required
-          disabled={isEdit}
-          hint={isEdit ? 'Cannot change after creation' : 'Unique ID assigned by admin'}
-          error={errors.asset_id?.message}
-          {...register('asset_id')}
-        />
-        <Controller
-          name="category_id"
-          control={control}
-          render={({ field }) => (
-            <Select
-              label="Category"
-              required
-              options={categoryOptions}
-              value={field.value || ''}
-              onChange={(e) => {
-                field.onChange(e)
-                setCategoryId(e.target.value)
-              }}
-              error={errors.category_id?.message}
-              placeholder={catsLoading ? 'Loading...' : 'Select category'}
-            />
-          )}
-        />
-      </div>
+      {/* Category — required */}
+      <Controller
+        name="category_id"
+        control={control}
+        render={({ field }) => (
+          <Select
+            label="Category"
+            required
+            options={categoryOptions}
+            value={field.value || ''}
+            onChange={(e) => {
+              field.onChange(e)
+              setCategoryId(e.target.value)
+            }}
+            error={errors.category_id?.message}
+            placeholder={catsLoading ? 'Loading...' : 'Select category'}
+          />
+        )}
+      />
 
       <div className="grid grid-cols-2 gap-4">
         <Input

@@ -146,7 +146,7 @@ const AssignAssetModal = ({ isOpen, onClose }) => {
 
   const assetOptions = (assetsData?.assets || []).map(a => ({
     value: String(a.id),
-    label: a.product_name || a.asset_id || `Asset #${a.id}`,
+    label: a.product_name || `Asset #${a.id}`,
     sublabel: [a.category_name, a.model, a.serial_number].filter(Boolean).join(' · '),
   }))
 

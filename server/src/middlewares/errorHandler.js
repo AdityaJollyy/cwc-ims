@@ -40,9 +40,9 @@ const errorHandler = (err, req, res, next) => {
   const statusCode = error.statusCode || 500;
   const message = error.isOperational ? error.message : 'Internal server error';
 
-  if (process.env.NODE_ENV === 'development' && !error.isOperational) {
-    console.error('❌ Unhandled Error:', err);
-  }
+  // Log every error for diagnostics
+  console.error(`❌ [${statusCode}] ${message}`, error.errors?.length ? error.errors : '', err.code || '', err.stack || '');
+
 
   res.status(statusCode).json({
     success: false,

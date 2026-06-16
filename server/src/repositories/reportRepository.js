@@ -23,7 +23,7 @@ const getEmployeeAssets = async () => {
         JSON_AGG(
           JSON_BUILD_OBJECT(
             'assignment_id', a.id,
-            'asset_id', ast.asset_id,
+            'asset_uuid', ast.id,
             'product_name', ast.product_name,
             'model', ast.model,
             'serial_number', ast.serial_number,
@@ -103,7 +103,7 @@ const getAssetStatusReport = async ({ category_id, status } = {}) => {
      LEFT JOIN assignments asg ON asg.asset_id = a.id AND asg.is_active = true
      LEFT JOIN employees emp ON emp.id = asg.employee_id
      ${whereClause}
-     ORDER BY c.name ASC, a.asset_id ASC`,
+     ORDER BY c.name ASC, a.product_name ASC`,
     params
   );
   return result.rows;
@@ -151,7 +151,6 @@ const getAssignmentHistory = async ({ from_date, to_date, employee_id } = {}) =>
       e.employee_id AS employee_code,
       e.division,
       e.designation,
-      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
       ast.serial_number,

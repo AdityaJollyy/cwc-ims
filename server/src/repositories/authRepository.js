@@ -7,8 +7,6 @@ const { query } = require('../config/database');
 
 /**
  * Find a user by email address (includes password_hash for auth)
- * NOTE: password_hash column must exist in users table.
- * Run: ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
  * @param {string} email
  * @returns {Object|null}
  */

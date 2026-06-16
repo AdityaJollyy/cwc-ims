@@ -157,9 +157,6 @@ const AssetDetailDrawer = ({ asset, isOpen, onClose, onUpdated }) => {
                   <Badge status={detail?.status} />
                 </div>
                 <p className="text-sm text-slate-500 mt-0.5">{detail?.category_name || '—'}</p>
-                {detail?.asset_id && (
-                  <p className="text-xs text-slate-400 mt-0.5 font-mono">{detail.asset_id}</p>
-                )}
               </div>
             </div>
 
@@ -168,7 +165,6 @@ const AssetDetailDrawer = ({ asset, isOpen, onClose, onUpdated }) => {
             {/* Details tab */}
             {tab === 'details' && (
               <div>
-                <InfoRow label="Asset ID" value={detail?.asset_id} />
                 <InfoRow label="Product Name" value={detail?.product_name} />
                 <InfoRow label="Category" value={detail?.category_name} />
                 <InfoRow label="Model" value={detail?.model} />
@@ -288,7 +284,6 @@ const AssetDetailDrawer = ({ asset, isOpen, onClose, onUpdated }) => {
           formId="asset-edit-form"
           isEdit
           defaultValues={{
-            asset_id: detail?.asset_id || '',
             category_id: String(detail?.category_id || ''),
             product_name: detail?.product_name || '',
             model: detail?.model || '',
@@ -300,9 +295,7 @@ const AssetDetailDrawer = ({ asset, isOpen, onClose, onUpdated }) => {
             custom_fields: detail?.custom_fields || {},
           }}
           onSubmit={(data) => {
-            // Strip asset_id from update payload (immutable)
-            const { asset_id, ...updateData } = data
-            updateMutation.mutate(updateData)
+            updateMutation.mutate(data)
           }}
         />
       </Modal>
@@ -365,11 +358,11 @@ const AssetDetailDrawer = ({ asset, isOpen, onClose, onUpdated }) => {
         onConfirm={() => deleteMutation.mutate()}
         loading={deleteMutation.isPending}
         confirmDisabled={isAssigned}
-        title={`Delete "${detail?.asset_id}"?`}
+        title={`Delete "${detail?.product_name || 'this asset'}"?`}
         message={
           isAssigned
             ? `⚠️ This asset is currently assigned. Please return it before deleting.`
-            : `This will permanently delete asset ${detail?.asset_id}${detail?.product_name ? ` (${detail.product_name})` : ''} and all its assignment history. This action cannot be undone.`
+            : `This will permanently delete ${detail?.product_name || 'this asset'} and all its assignment history. This action cannot be undone.`
         }
         confirmLabel="Delete Permanently"
         confirmVariant="danger"

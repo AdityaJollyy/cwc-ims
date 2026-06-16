@@ -50,7 +50,6 @@ const exportAssets = asyncHandler(async (req, res) => {
   const assets = await reportService.getAssetStatusReport({});
 
   const columns = [
-    { header: 'Asset ID', key: 'asset_id', width: 15 },
     { header: 'Category', key: 'category_name', width: 20 },
     { header: 'Product Name', key: 'product_name', width: 30 },
     { header: 'Model', key: 'model', width: 20 },
@@ -65,7 +64,6 @@ const exportAssets = asyncHandler(async (req, res) => {
   ];
 
   const rows = assets.map((asset) => ({
-    asset_id: asset.asset_id || '',
     category_name: asset.category_name || '',
     product_name: asset.product_name || '',
     model: asset.model || '',
@@ -100,7 +98,6 @@ const exportAssignments = asyncHandler(async (req, res) => {
     { header: 'Employee ID', key: 'employee_code', width: 15 },
     { header: 'Division', key: 'division', width: 20 },
     { header: 'Designation', key: 'designation', width: 25 },
-    { header: 'Asset ID', key: 'asset_code', width: 15 },
     { header: 'Product Name', key: 'product_name', width: 30 },
     { header: 'Category', key: 'category_name', width: 20 },
     { header: 'Serial Number', key: 'serial_number', width: 22 },
@@ -117,7 +114,6 @@ const exportAssignments = asyncHandler(async (req, res) => {
     employee_code: a.employee_code || '',
     division: a.division || '',
     designation: a.designation || '',
-    asset_code: a.asset_code || '',
     product_name: a.product_name || '',
     category_name: a.category_name || '',
     serial_number: a.serial_number || '',

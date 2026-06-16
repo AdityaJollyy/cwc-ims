@@ -44,7 +44,6 @@ const findAll = async ({ employee_id, asset_id, is_active, limit, offset }) => {
       e.name AS employee_name,
       e.employee_id AS employee_code,
       e.division AS employee_division,
-      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
       ast.serial_number,
@@ -79,7 +78,6 @@ const findById = async (id) => {
       e.name AS employee_name,
       e.employee_id AS employee_code,
       e.designation AS employee_designation,
-      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
       ast.serial_number,
@@ -163,7 +161,7 @@ const getHistory = async ({ search, employee_id, category_id, limit, offset }) =
     const term = `%${search.trim()}%`;
     params.push(term, term, term);
     conditions.push(
-      `(e.name ILIKE $${params.length - 2} OR ast.product_name ILIKE $${params.length - 1} OR ast.asset_id ILIKE $${params.length})`
+      `(e.name ILIKE $${params.length - 2} OR ast.product_name ILIKE $${params.length - 1} OR ast.serial_number ILIKE $${params.length})`
     );
   }
 
@@ -186,9 +184,10 @@ const getHistory = async ({ search, employee_id, category_id, limit, offset }) =
       a.*,
       e.name AS employee_name,
       e.employee_id AS employee_code,
-      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
+      ast.serial_number,
+      ast.asset_number,
       c.name AS category_name,
       COUNT(*) OVER() AS total_count
     FROM assignments a

@@ -72,9 +72,9 @@ const getRecentActivity = async (limit = 10) => {
       a.return_condition,
       e.name AS employee_name,
       e.employee_id AS employee_code,
-      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
+      ast.serial_number,
       c.name AS category_name,
       CASE WHEN a.is_active = true THEN 'assigned' ELSE 'returned' END AS activity_type
      FROM assignments a

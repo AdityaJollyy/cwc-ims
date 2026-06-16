@@ -5,7 +5,7 @@ const ApiError = require('../utils/ApiError');
 /**
  * Asset Service
  * Business logic for asset management.
- * asset_id is admin-entered and immutable after creation.
+ * Assets are identified by UUID (id) only.
  */
 
 const getAll = async (queryParams) => {
@@ -35,15 +35,7 @@ const getById = async (id) => {
 };
 
 const create = async (data, userId) => {
-  const { asset_id, ...rest } = data;
-
-  // Check asset_id uniqueness
-  const existing = await assetRepository.findByAssetId(asset_id);
-  if (existing) {
-    throw ApiError.conflict(`Asset ID "${asset_id}" is already in use`);
-  }
-
-  return assetRepository.create({ ...rest, asset_id, created_by: userId });
+  return assetRepository.create({ ...data, created_by: userId });
 };
 
 const update = async (id, data) => {

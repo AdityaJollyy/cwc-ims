@@ -205,7 +205,6 @@ const getAssignments = async (employeeId) => {
   const result = await query(
     `SELECT
       a.*,
-      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
       ast.serial_number,
@@ -230,7 +229,6 @@ const getHistory = async (employeeId) => {
   const result = await query(
     `SELECT
       a.*,
-      ast.asset_id AS asset_code,
       ast.product_name,
       ast.model,
       ast.serial_number,

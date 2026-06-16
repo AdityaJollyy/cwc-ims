@@ -61,7 +61,7 @@ const EmployeeAssetsTab = () => {
     {
       key: 'assigned_assets', header: 'Assets',
       render: (v) => Array.isArray(v) && v.length
-        ? <div className="flex flex-wrap gap-1">{v.slice(0, 3).map((a, i) => <span key={i} className="text-xs bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-mono">{a.asset_id}</span>)}{v.length > 3 && <span className="text-xs text-slate-400">+{v.length - 3}</span>}</div>
+        ? <div className="flex flex-wrap gap-1">{v.slice(0, 3).map((a, i) => <span key={i} className="text-xs bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded">{a.product_name || a.category_name || 'Asset'}</span>)}{v.length > 3 && <span className="text-xs text-slate-400">+{v.length - 3}</span>}</div>
         : <span className="text-slate-400 text-xs">None</span>
     },
   ]
@@ -117,10 +117,10 @@ const AssetStatusTab = () => {
   }
 
   const columns = [
-    { key: 'asset_id', header: 'Asset ID', render: v => <span className="font-mono text-xs font-medium text-indigo-600">{v}</span> },
     { key: 'product_name', header: 'Product', render: v => v || '—' },
     { key: 'category_name', header: 'Category' },
     { key: 'serial_number', header: 'Serial No', render: v => v ? <span className="font-mono text-xs">{v}</span> : '—' },
+    { key: 'asset_number', header: 'Asset No', render: v => v ? <span className="font-mono text-xs">{v}</span> : '—' },
     { key: 'status', header: 'Status', render: v => <Badge status={v} /> },
     { key: 'purchase_date', header: 'Purchased', render: v => formatDate(v) },
     { key: 'warranty_expiry', header: 'Warranty', render: (v) => {
@@ -167,7 +167,7 @@ const AssignmentHistoryTab = () => {
 
   const columns = [
     { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium">{v}</p><p className="text-xs text-slate-400">{r.employee_id_code}</p></div> },
-    { key: 'asset_id', header: 'Asset', render: (v, r) => <div><p className="font-mono text-xs text-indigo-600 font-medium">{v}</p><p className="text-xs text-slate-500">{r.product_name}</p></div> },
+    { key: 'asset_id', header: 'Asset', render: (_, r) => <div><p className="font-medium text-slate-800">{r.product_name || r.category_name || '—'}</p>{r.serial_number && <p className="font-mono text-xs text-slate-500">{r.serial_number}</p>}</div> },
     { key: 'assigned_at', header: 'Assigned', render: v => formatDate(v) },
     { key: 'returned_at', header: 'Returned', render: v => v ? formatDate(v) : <span className="text-indigo-600 text-xs font-medium">Active</span> },
     { key: 'return_condition', header: 'Condition', render: v => v ? <Badge status={v} /> : '—' },
@@ -227,7 +227,6 @@ const DamagedAssetsTab = () => {
   })
 
   const columns = [
-    { key: 'asset_id', header: 'Asset ID', render: v => <span className="font-mono text-xs font-medium text-red-600">{v}</span> },
     { key: 'product_name', header: 'Product', render: v => v || '—' },
     { key: 'category_name', header: 'Category' },
     { key: 'model', header: 'Model', render: v => v || '—' },

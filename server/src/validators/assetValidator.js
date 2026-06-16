@@ -2,11 +2,10 @@ const { z } = require('zod');
 
 /**
  * Asset validation schemas
- * asset_id is REQUIRED and admin-entered (can contain letters, numbers, hyphens, etc.).
+ * Assets are identified by UUID (id) only — no asset_id text column.
  */
 
 const createAssetSchema = z.object({
-  asset_id: z.string().min(1, 'Asset ID is required'),
   category_id: z.coerce.number().int().positive('Category is required'),
   product_name: z.string().optional(),
   model: z.string().optional(),

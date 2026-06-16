@@ -3,7 +3,7 @@ const { query } = require('../config/database');
 /**
  * Asset Repository
  * All database operations for assets.
- * asset_id is a TEXT field, unique, admin-entered.
+ * Assets are identified by UUID (id) only — no human-facing code column.
  */
 
 const findAll = async ({ search, category_id, status, limit, offset }) => {
@@ -12,9 +12,9 @@ const findAll = async ({ search, category_id, status, limit, offset }) => {
 
   if (search && search.trim()) {
     const term = `%${search.trim()}%`;
-    params.push(term, term, term, term);
+    params.push(term, term, term);
     conditions.push(
-      `(a.asset_id ILIKE $${params.length - 3} OR a.product_name ILIKE $${params.length - 2} OR a.serial_number ILIKE $${params.length - 1} OR a.asset_number ILIKE $${params.length})`
+      `(a.product_name ILIKE $${params.length - 2} OR a.serial_number ILIKE $${params.length - 1} OR a.asset_number ILIKE $${params.length})`
     );
   }
 
@@ -75,13 +75,7 @@ const findById = async (id) => {
   return result.rows[0] || null;
 };
 
-const findByAssetId = async (asset_id) => {
-  const result = await query('SELECT * FROM assets WHERE asset_id = $1', [asset_id]);
-  return result.rows[0] || null;
-};
-
 const create = async ({
-  asset_id,
   category_id,
   product_name,
   model,
@@ -95,12 +89,11 @@ const create = async ({
 }) => {
   const result = await query(
     `INSERT INTO assets
-       (asset_id, category_id, product_name, model, serial_number, asset_number,
+       (category_id, product_name, model, serial_number, asset_number,
         purchase_date, warranty_expiry, remarks, custom_fields, created_by)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      RETURNING *`,
     [
-      asset_id,
       category_id,
       product_name || null,
       model || null,
@@ -176,5 +169,5 @@ const deleteAsset = async (id) => {
   return result.rows.length > 0;
 };
 
-module.exports = { findAll, findById, findByAssetId, create, update, updateStatus, deleteAssignmentsByAssetId, deleteAsset };
+module.exports = { findAll, findById, create, update, updateStatus, deleteAssignmentsByAssetId, deleteAsset };
 

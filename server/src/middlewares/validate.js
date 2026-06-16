@@ -10,6 +10,11 @@ const validateBody = (schema) => (req, res, next) => {
       field: e.path.join('.'),
       message: e.message,
     }));
+    console.error('🔴 validateBody FAILED', {
+      url: req.originalUrl,
+      body: req.body,
+      errors,
+    });
     return next(ApiError.badRequest('Validation failed', errors));
   }
   req.body = result.data;

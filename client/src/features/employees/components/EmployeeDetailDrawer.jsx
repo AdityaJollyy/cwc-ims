@@ -96,17 +96,16 @@ const EmployeeDetailDrawer = ({ employee, isOpen, onClose, onUpdate }) => {
   ]
 
   // Backend returns assigned_at and returned_at (not assigned_date / returned_date)
-  // Also returns asset_code (not asset_id — that's the internal UUID table col)
   const equipmentColumns = [
-    { key: 'asset_code', header: 'Asset ID', render: (v) => <span className="font-mono text-xs text-indigo-600 font-medium">{v}</span> },
     { key: 'product_name', header: 'Product', render: (v) => v || '—' },
     { key: 'category_name', header: 'Category', render: (v) => v || '—' },
+    { key: 'serial_number', header: 'Serial No', render: (v) => v ? <span className="font-mono text-xs">{v}</span> : '—' },
     { key: 'assigned_at', header: 'Assigned', render: (v) => formatDate(v) },
   ]
 
   const historyColumns = [
-    { key: 'asset_code', header: 'Asset ID', render: (v) => <span className="font-mono text-xs text-indigo-600 font-medium">{v}</span> },
     { key: 'product_name', header: 'Product', render: (v) => v || '—' },
+    { key: 'category_name', header: 'Category', render: (v) => v || '—' },
     { key: 'assigned_at', header: 'Assigned', render: (v) => formatDate(v) },
     {
       key: 'returned_at', header: 'Returned',

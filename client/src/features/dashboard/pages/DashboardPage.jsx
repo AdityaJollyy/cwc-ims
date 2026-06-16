@@ -241,7 +241,7 @@ const DashboardPage = () => {
                   </p>
                   <p className="text-xs text-slate-500 truncate">
                     {item.product_name || item.category_name || 'Unknown asset'}
-                    {item.asset_code ? ` · ${item.asset_code}` : ''}
+                    {item.serial_number ? ` · ${item.serial_number}` : ''}
                   </p>
                 </div>
 

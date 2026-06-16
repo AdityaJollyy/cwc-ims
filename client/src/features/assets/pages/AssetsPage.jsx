@@ -62,11 +62,11 @@ const AssetsPage = () => {
   ]
 
   const columns = [
-    { key: 'asset_id', header: 'Asset ID', width: '110px', render: (v) => <span className="font-mono text-xs font-medium text-indigo-600">{v}</span> },
     { key: 'product_name', header: 'Product Name', render: (v) => v || <span className="text-slate-400">—</span> },
     { key: 'category_name', header: 'Category' },
     { key: 'model', header: 'Model', render: (v) => v || <span className="text-slate-400">—</span> },
     { key: 'serial_number', header: 'Serial No.', render: (v) => v ? <span className="font-mono text-xs">{v}</span> : <span className="text-slate-400">—</span> },
+    { key: 'asset_number', header: 'Asset No.', render: (v) => v ? <span className="font-mono text-xs">{v}</span> : <span className="text-slate-400">—</span> },
     { key: 'status', header: 'Status', render: (v) => <Badge status={v} /> },
     {
       key: 'actions', header: '', width: '60px',

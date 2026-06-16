@@ -79,7 +79,7 @@ const AssignModal = ({ isOpen, onClose, onSuccess }) => {
           <label className="text-sm font-medium text-slate-700">Asset <span className="text-red-500">*</span></label>
           <select value={form.asset_id} onChange={e => setForm(f => ({ ...f, asset_id: e.target.value }))} className={inputCls}>
             <option value="">Select available asset...</option>
-            {(availableAssets || []).map(a => <option key={a.id} value={a.id}>{a.asset_id} — {a.product_name || a.category_name}</option>)}
+            {(availableAssets || []).map(a => <option key={a.id} value={a.id}>{a.product_name || a.category_name}{a.serial_number ? ` — ${a.serial_number}` : ''}</option>)}
           </select>
         </div>
 
@@ -143,7 +143,7 @@ const ReturnModal = ({ isOpen, onClose, assignment, onSuccess }) => {
         {assignment && (
           <div className="bg-slate-50 rounded-lg p-3 text-sm">
             <p className="text-slate-500 text-xs mb-1">Returning</p>
-            <p className="font-medium text-slate-800">{assignment.asset_code} — {assignment.product_name || assignment.category_name}</p>
+            <p className="font-medium text-slate-800">{assignment.product_name || assignment.category_name}{assignment.serial_number ? ` — ${assignment.serial_number}` : ''}</p>
             <p className="text-slate-500">From: {assignment.employee_name}</p>
           </div>
         )}
@@ -222,7 +222,7 @@ const AssignmentsPage = () => {
 
   const activeColumns = [
     { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium text-slate-800">{v}</p><p className="text-xs text-slate-400">{r.employee_code}</p></div> },
-    { key: 'asset_code', header: 'Asset', render: (v, r) => <div><p className="font-mono text-xs font-medium text-indigo-600">{v}</p><p className="text-xs text-slate-500">{r.product_name || r.category_name}</p></div> },
+    { key: 'product_name', header: 'Asset', render: (_, r) => <div><p className="font-medium text-slate-800">{r.product_name || r.category_name}</p>{r.serial_number && <p className="font-mono text-xs text-slate-500">{r.serial_number}</p>}</div> },
     { key: 'assigned_at', header: 'Assigned Date', render: (v) => formatDate(v) },
     { key: 'days_active', header: 'Days Active', render: (_, row) => <span className="font-medium">{getDaysActive(row.assigned_at)}d</span> },
     {
@@ -237,7 +237,7 @@ const AssignmentsPage = () => {
 
   const historyColumns = [
     { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium">{v}</p><p className="text-xs text-slate-400">{r.employee_code}</p></div> },
-    { key: 'asset_code', header: 'Asset', render: (v, r) => <div><p className="font-mono text-xs font-medium text-indigo-600">{v}</p><p className="text-xs text-slate-500">{r.product_name || r.category_name}</p></div> },
+    { key: 'product_name', header: 'Asset', render: (_, r) => <div><p className="font-medium text-slate-800">{r.product_name || r.category_name}</p>{r.serial_number && <p className="font-mono text-xs text-slate-500">{r.serial_number}</p>}</div> },
     { key: 'assigned_at', header: 'Assigned', render: (v) => formatDate(v) },
     { key: 'returned_at', header: 'Returned', render: (v) => v ? formatDate(v) : <span className="text-indigo-600 text-xs font-medium">Active</span> },
     { key: 'return_condition', header: 'Condition', render: (v) => v ? <Badge status={v} /> : '—' },
