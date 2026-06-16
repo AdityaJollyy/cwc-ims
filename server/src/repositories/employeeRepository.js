@@ -1,39 +1,31 @@
 const { query } = require('../config/database');
-const { buildSearchClause } = require('../utils/pagination');
 
 /**
  * Employee Repository
- * All database operations for employees
+ * All database operations for employees.
+ *
+ * employee_code is an OPTIONAL display label. The internal UUID (id)
+ * is the canonical identifier used for every foreign key.
  */
 
 /**
  * Find all employees with optional filtering and pagination
  * Returns total count via COUNT(*) OVER() window function
- * @param {Object} params
- * @param {string} [params.search]
- * @param {string} [params.division]
- * @param {string} [params.designation]
- * @param {boolean} [params.is_archived]
- * @param {number} params.limit
- * @param {number} params.offset
- * @returns {{ rows: Object[], total: number }}
  */
 const findAll = async ({ search, division, designation, is_archived, limit, offset }) => {
   const conditions = [];
   const params = [];
 
-  // Filter by archive status only when explicitly provided (undefined = show all)
   if (is_archived !== undefined) {
     params.push(is_archived);
     conditions.push(`e.is_archived = $${params.length}`);
   }
 
-  // Full-text search across multiple columns
   if (search && search.trim()) {
     const term = `%${search.trim()}%`;
     params.push(term, term, term, term);
     conditions.push(
-      `(e.name ILIKE $${params.length - 3} OR e.employee_id ILIKE $${params.length - 2} OR e.division ILIKE $${params.length - 1} OR e.designation ILIKE $${params.length})`
+      `(e.name ILIKE $${params.length - 3} OR e.employee_code ILIKE $${params.length - 2} OR e.division ILIKE $${params.length - 1} OR e.designation ILIKE $${params.length})`
     );
   }
 
@@ -74,8 +66,6 @@ const findAll = async ({ search, division, designation, is_archived, limit, offs
 
 /**
  * Find a single employee by internal UUID with assignment count
- * @param {string} id - UUID primary key
- * @returns {Object|null}
  */
 const findById = async (id) => {
   const result = await query(
@@ -92,48 +82,46 @@ const findById = async (id) => {
 };
 
 /**
- * Find employee by their string employee_id (e.g. "EMP0001")
- * @param {string} employee_id
- * @returns {Object|null}
+ * Find employee by their string employee_code (e.g. "EMP0001")
  */
-const findByEmployeeId = async (employee_id) => {
+const findByEmployeeCode = async (employee_code) => {
+  if (!employee_code) return null;
   const result = await query(
-    'SELECT * FROM employees WHERE employee_id = $1',
-    [employee_id]
+    'SELECT * FROM employees WHERE employee_code = $1',
+    [employee_code]
   );
   return result.rows[0] || null;
 };
 
 /**
- * Create a new employee record
- * @param {Object} data
- * @returns {Object}
+ * Create a new employee record. employee_code may be null.
  */
-const create = async ({ employee_id, name, division, designation, mobile, email, remarks, created_by }) => {
+const create = async ({ employee_code, name, division, designation, mobile, email, remarks, created_by }) => {
   const result = await query(
-    `INSERT INTO employees (employee_id, name, division, designation, mobile, email, remarks, created_by)
+    `INSERT INTO employees (employee_code, name, division, designation, mobile, email, remarks, created_by)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING *`,
-    [employee_id, name, division || null, designation || null, mobile || null, email || null, remarks || null, created_by]
+    [employee_code || null, name, division || null, designation || null, mobile || null, email || null, remarks || null, created_by]
   );
   return result.rows[0];
 };
 
 /**
- * Update employee fields dynamically
- * Only updates provided fields
- * @param {string} id
- * @param {Object} fields
- * @returns {Object}
+ * Update employee fields dynamically. Only updates provided fields.
  */
 const update = async (id, fields) => {
-  const allowedFields = ['name', 'division', 'designation', 'mobile', 'email', 'remarks'];
+  const allowedFields = ['employee_code', 'name', 'division', 'designation', 'mobile', 'email', 'remarks'];
   const setClauses = [];
   const params = [];
 
   for (const field of allowedFields) {
     if (Object.prototype.hasOwnProperty.call(fields, field)) {
-      params.push(fields[field]);
+      // Normalize empty strings to null for the optional employee_code
+      let value = fields[field];
+      if (field === 'employee_code' && (value === '' || value === undefined)) {
+        value = null;
+      }
+      params.push(value);
       setClauses.push(`${field} = $${params.length}`);
     }
   }
@@ -157,9 +145,6 @@ const update = async (id, fields) => {
 
 /**
  * Set an employee's archived status
- * @param {string} id
- * @param {boolean} is_archived
- * @returns {Object}
  */
 const archive = async (id, is_archived) => {
   const result = await query(
@@ -174,7 +159,6 @@ const archive = async (id, is_archived) => {
 
 /**
  * Delete all assignment records for an employee (cascade helper — no ON DELETE CASCADE in schema)
- * @param {string} employeeId - UUID
  */
 const deleteAssignmentsByEmployeeId = async (employeeId) => {
   await query(`DELETE FROM assignments WHERE employee_id = $1`, [employeeId]);
@@ -182,10 +166,6 @@ const deleteAssignmentsByEmployeeId = async (employeeId) => {
 
 /**
  * Permanently delete an employee record
- * Cascade deletes will handle assignment history (via FK ON DELETE CASCADE
- * on the assignments table is not set, so we check manually)
- * @param {string} id - UUID
- * @returns {boolean}
  */
 const deleteEmployee = async (id) => {
   const result = await query(
@@ -198,8 +178,6 @@ const deleteEmployee = async (id) => {
 
 /**
  * Get all active assignments for an employee (with asset details)
- * @param {string} employeeId - UUID
- * @returns {Object[]}
  */
 const getAssignments = async (employeeId) => {
   const result = await query(
@@ -222,8 +200,6 @@ const getAssignments = async (employeeId) => {
 
 /**
  * Get full assignment history for an employee
- * @param {string} employeeId - UUID
- * @returns {Object[]}
  */
 const getHistory = async (employeeId) => {
   const result = await query(
@@ -246,7 +222,6 @@ const getHistory = async (employeeId) => {
 
 /**
  * Get distinct division values (for filter dropdowns)
- * @returns {string[]}
  */
 const getDivisions = async () => {
   const result = await query(
@@ -260,7 +235,6 @@ const getDivisions = async () => {
 
 /**
  * Get distinct designation values (for filter dropdowns)
- * @returns {string[]}
  */
 const getDesignations = async () => {
   const result = await query(
@@ -275,7 +249,7 @@ const getDesignations = async () => {
 module.exports = {
   findAll,
   findById,
-  findByEmployeeId,
+  findByEmployeeCode,
   create,
   update,
   archive,
@@ -286,4 +260,3 @@ module.exports = {
   getDivisions,
   getDesignations,
 };
-

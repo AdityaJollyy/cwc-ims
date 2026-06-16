@@ -71,7 +71,7 @@ const getRecentActivity = async (limit = 10) => {
       a.returned_at,
       a.return_condition,
       e.name AS employee_name,
-      e.employee_id AS employee_code,
+      e.employee_code,
       ast.product_name,
       ast.model,
       ast.serial_number,

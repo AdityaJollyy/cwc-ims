@@ -211,7 +211,8 @@ const issue = async (id, { employee_id, quantity, is_returnable, remarks }, user
   // they'll come back via the return flow.
   await consumableRepository.removeStock(id, quantity);
 
-  const referenceText = `Issued to ${employee.name} (${employee.employee_id})${is_returnable ? ' — returnable' : ' — consumed on issue'}`;
+  const employeeLabel = employee.employee_code ? `${employee.name} (${employee.employee_code})` : employee.name;
+  const referenceText = `Issued to ${employeeLabel}${is_returnable ? ' — returnable' : ' — consumed on issue'}`;
 
   if (is_returnable) {
     const [assignment, transaction] = await Promise.all([
@@ -313,7 +314,7 @@ const returnIssue = async (assignmentId, { returned_quantity, condition, remarks
     consumable_id: assignment.consumable_id,
     transaction_type: TRANSACTION_TYPES.RETURNED,
     quantity: returned_quantity,
-    reference: `Returned by ${assignment.employee_name} (${assignment.employee_code}) — ${condition}`,
+    reference: `Returned by ${assignment.employee_name}${assignment.employee_code ? ` (${assignment.employee_code})` : ''} — ${condition}`,
     remarks,
     performed_by: userId,
     employee_id: assignment.employee_id,

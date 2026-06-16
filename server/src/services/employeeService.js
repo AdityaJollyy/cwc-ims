@@ -5,7 +5,9 @@ const ApiError = require('../utils/ApiError');
 /**
  * Employee Service
  * All business logic for employee management.
- * employee_id is admin-entered and immutable after creation.
+ *
+ * employee_code is OPTIONAL. When provided it must be unique;
+ * when blank it is stored as NULL.
  */
 
 const getAll = async (queryParams) => {
@@ -58,12 +60,14 @@ const getById = async (id) => {
 };
 
 const create = async (data, userId) => {
-  const { employee_id } = data;
+  const { employee_code } = data;
 
-  // Check employee_id uniqueness
-  const existing = await employeeRepository.findByEmployeeId(employee_id);
-  if (existing) {
-    throw ApiError.conflict(`Employee ID "${employee_id}" is already in use`);
+  // Only validate uniqueness when a code is supplied
+  if (employee_code) {
+    const existing = await employeeRepository.findByEmployeeCode(employee_code);
+    if (existing) {
+      throw ApiError.conflict(`Employee code "${employee_code}" is already in use`);
+    }
   }
 
   return employeeRepository.create({ ...data, created_by: userId });
@@ -74,6 +78,19 @@ const update = async (id, data) => {
   if (!employee) {
     throw ApiError.notFound(`Employee not found`);
   }
+
+  // If employee_code is being changed to a non-empty value, ensure it's unique
+  if (
+    Object.prototype.hasOwnProperty.call(data, 'employee_code') &&
+    data.employee_code &&
+    data.employee_code !== employee.employee_code
+  ) {
+    const existing = await employeeRepository.findByEmployeeCode(data.employee_code);
+    if (existing && existing.id !== id) {
+      throw ApiError.conflict(`Employee code "${data.employee_code}" is already in use`);
+    }
+  }
+
   return employeeRepository.update(id, data);
 };
 
@@ -121,17 +138,14 @@ const deleteEmployee = async (id) => {
   if (!employee) {
     throw ApiError.notFound(`Employee not found`);
   }
-  // Block deletion if any active assignments exist
   if (parseInt(employee.assigned_count, 10) > 0) {
     throw ApiError.conflict(
       `Cannot delete this employee — they currently have ${employee.assigned_count} asset(s) assigned. Please return all assets first.`
     );
   }
-  // Delete related assignment records first (no ON DELETE CASCADE on assignments table)
   await employeeRepository.deleteAssignmentsByEmployeeId(id);
   await employeeRepository.deleteEmployee(id);
   return true;
 };
 
 module.exports = { getAll, getById, create, update, archive, unarchive, deleteEmployee, getAssignments, getHistory };
-

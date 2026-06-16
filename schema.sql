@@ -4,9 +4,11 @@
 -- Single source of truth. Run via: node seed.js
 -- (or paste into Supabase SQL Editor after dropping all tables)
 --
--- Employee IDs : manually entered by admin (e.g. "EMP001").
--- Assets       : identified internally by UUID only — no human-facing
---                code. Display uses product_name / serial_number.
+-- Employee codes : optional human-readable label (e.g. "EMP001").
+--                  Internal UUID (id) is the real identifier and is
+--                  used for every foreign-key relationship.
+-- Assets         : identified internally by UUID only — no human-facing
+--                  code. Display uses product_name / serial_number.
 --
 -- "Returnable vs consumed-on-issue" for bulk-inventory items
 -- is a per-issuance decision — recorded on consumable_assignments,
@@ -57,25 +59,28 @@ CREATE TABLE IF NOT EXISTS category_fields (
 );
 
 -- ─── Employees ────────────────────────────────────────────────
--- employee_id is entered by admin and serves as the unique display identifier.
--- The internal UUID (id) is used for all foreign key relationships.
+-- The internal UUID (id) is the canonical identifier and is used for
+-- all foreign key relationships.
+-- employee_code is an OPTIONAL admin-entered display label
+-- (e.g. "EMP001"). When provided it must be unique; NULL is allowed
+-- and Postgres permits multiple NULLs in a UNIQUE column.
 CREATE TABLE IF NOT EXISTS employees (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  employee_id TEXT        UNIQUE NOT NULL,
-  name        TEXT        NOT NULL,
-  division    TEXT,
-  designation TEXT,
-  mobile      TEXT,
-  email       TEXT,
-  remarks     TEXT,
-  is_archived BOOLEAN     NOT NULL DEFAULT false,
-  created_by  UUID        REFERENCES users(id) ON DELETE SET NULL,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  employee_code TEXT        UNIQUE,
+  name          TEXT        NOT NULL,
+  division      TEXT,
+  designation   TEXT,
+  mobile        TEXT,
+  email         TEXT,
+  remarks       TEXT,
+  is_archived   BOOLEAN     NOT NULL DEFAULT false,
+  created_by    UUID        REFERENCES users(id) ON DELETE SET NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_employees_employee_id ON employees(employee_id);
-CREATE INDEX IF NOT EXISTS idx_employees_is_archived  ON employees(is_archived);
+CREATE INDEX IF NOT EXISTS idx_employees_employee_code ON employees(employee_code);
+CREATE INDEX IF NOT EXISTS idx_employees_is_archived   ON employees(is_archived);
 
 -- ─── Assets ───────────────────────────────────────────────────
 -- Identified internally by UUID (id). No human-facing code.

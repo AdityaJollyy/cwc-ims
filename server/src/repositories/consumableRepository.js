@@ -143,7 +143,7 @@ const getTransactions = async (consumableId, { limit, offset }) => {
       st.*,
       u.full_name AS performed_by_name,
       e.name AS employee_name,
-      e.employee_id AS employee_code,
+      e.employee_code,
       COUNT(*) OVER() AS total_count
      FROM stock_transactions st
      LEFT JOIN users u ON u.id = st.performed_by
@@ -215,7 +215,7 @@ const findAllAssignments = async ({ employee_id, consumable_id, is_active, searc
     SELECT
       ca.*,
       e.name AS employee_name,
-      e.employee_id AS employee_code,
+      e.employee_code,
       e.division AS employee_division,
       c.name AS consumable_name,
       c.category AS consumable_category,
@@ -241,7 +241,7 @@ const findAssignmentById = async (id) => {
     `SELECT
       ca.*,
       e.name AS employee_name,
-      e.employee_id AS employee_code,
+      e.employee_code,
       c.name AS consumable_name,
       c.unit AS consumable_unit
      FROM consumable_assignments ca

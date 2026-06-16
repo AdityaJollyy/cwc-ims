@@ -2,11 +2,21 @@ const { z } = require('zod');
 
 /**
  * Employee validation schemas
- * employee_id is REQUIRED and admin-entered (can contain letters, numbers, hyphens).
+ *
+ * employee_code is OPTIONAL — admin-entered display label
+ * (letters, numbers, hyphens). Empty strings are normalized to null.
  */
 
+const employeeCodeField = z
+  .string()
+  .trim()
+  .max(64, 'Employee code is too long')
+  .optional()
+  .transform((v) => (v === '' || v === undefined ? null : v))
+  .nullable();
+
 const createEmployeeSchema = z.object({
-  employee_id: z.string().min(1, 'Employee ID is required'),
+  employee_code: employeeCodeField,
   name: z.string().min(1, 'Employee name is required'),
   division: z.string().optional(),
   designation: z.string().optional(),
@@ -20,6 +30,7 @@ const createEmployeeSchema = z.object({
 });
 
 const updateEmployeeSchema = z.object({
+  employee_code: employeeCodeField,
   name: z.string().min(1, 'Name cannot be empty').optional(),
   division: z.string().optional(),
   designation: z.string().optional(),

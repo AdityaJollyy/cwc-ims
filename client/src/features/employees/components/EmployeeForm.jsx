@@ -6,7 +6,7 @@ import Input from '../../../components/ui/Input'
 import Textarea from '../../../components/ui/Textarea'
 
 const schema = z.object({
-  employee_id: z.string().min(1, 'Employee ID is required'),
+  employee_code: z.string().optional(),
   name: z.string().min(1, 'Name is required'),
   division: z.string().optional(),
   designation: z.string().optional(),
@@ -34,13 +34,11 @@ const EmployeeForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
     <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="Employee ID"
-          placeholder="e.g. EMP001, A-23, HR-05"
-          required
-          disabled={isEdit}
-          hint={isEdit ? 'Cannot change after creation' : 'Unique ID assigned by admin'}
-          error={errors.employee_id?.message}
-          {...register('employee_id')}
+          label="Employee Code"
+          placeholder="e.g. EMP001, A-23 (optional)"
+          hint="Optional unique label assigned by admin"
+          error={errors.employee_code?.message}
+          {...register('employee_code')}
         />
         <Input
           label="Full Name"

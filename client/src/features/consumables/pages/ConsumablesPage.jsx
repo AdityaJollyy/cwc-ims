@@ -145,7 +145,7 @@ const IssueModal = ({ isOpen, onClose, consumable, onSuccess }) => {
           <label className="text-sm font-medium text-slate-700">Employee <span className="text-red-500">*</span></label>
           <select value={employeeId} onChange={e => setEmployeeId(e.target.value)} className={inputCls}>
             <option value="">Select employee...</option>
-            {(employees || []).map(e => <option key={e.id} value={e.id}>{e.name} ({e.employee_id})</option>)}
+            {(employees || []).map(e => <option key={e.id} value={e.id}>{e.name}{e.employee_code ? ` (${e.employee_code})` : ''}</option>)}
           </select>
         </div>
 
@@ -254,7 +254,7 @@ const ReturnIssuanceModal = ({ isOpen, onClose, assignment, onSuccess }) => {
         <div className="bg-slate-50 rounded-lg p-3 text-sm">
           <p className="text-slate-500 text-xs mb-1">Returning</p>
           <p className="font-medium text-slate-800">{assignment.consumable_name}</p>
-          <p className="text-slate-500">From: {assignment.employee_name} ({assignment.employee_code})</p>
+          <p className="text-slate-500">From: {assignment.employee_name}{assignment.employee_code ? ` (${assignment.employee_code})` : ''}</p>
           <p className="text-slate-500">Issued: {assignment.quantity} {unit}</p>
         </div>
 
@@ -449,7 +449,7 @@ const ConsumableDetailDrawer = ({ isOpen, onClose, consumable: initialConsumable
                   <div key={a.id} className="flex items-center gap-3 p-3 rounded-lg border border-slate-100 hover:bg-slate-50">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-slate-800">{a.employee_name}</p>
-                      <p className="text-xs text-slate-500">{a.employee_code} · {a.quantity} {consumable.unit || 'units'} · {getDaysActive(a.assigned_at)}d ago</p>
+                      <p className="text-xs text-slate-500">{[a.employee_code, `${a.quantity} ${consumable.unit || 'units'}`, `${getDaysActive(a.assigned_at)}d ago`].filter(Boolean).join(' · ')}</p>
                     </div>
                     <Button size="xs" variant="secondary" onClick={() => setReturnAssignment(a)}>Return</Button>
                   </div>
@@ -472,7 +472,7 @@ const ConsumableDetailDrawer = ({ isOpen, onClose, consumable: initialConsumable
                         <p className="text-sm font-semibold text-slate-800">
                           {tx.transaction_type === 'stock_in' || tx.transaction_type === 'returned' ? '+' : tx.transaction_type === 'damaged' ? '⚠' : '-'}{tx.quantity} {consumable.unit || 'units'}
                         </p>
-                        {tx.employee_name && <p className="text-xs text-slate-500 truncate">{tx.employee_name} ({tx.employee_code})</p>}
+                        {tx.employee_name && <p className="text-xs text-slate-500 truncate">{tx.employee_name}{tx.employee_code ? ` (${tx.employee_code})` : ''}</p>}
                         {tx.reference && !tx.employee_name && <p className="text-xs text-slate-500 truncate">{tx.reference}</p>}
                       </div>
                       <p className="text-xs text-slate-400 shrink-0">{formatDate(tx.created_at)}</p>
@@ -595,7 +595,7 @@ const IssuancesTab = () => {
   const columns = [
     {
       key: 'employee_name', header: 'Employee',
-      render: (v, r) => <div><p className="font-medium text-slate-800">{v}</p><p className="text-xs text-slate-400">{r.employee_code}</p></div>,
+      render: (v, r) => <div><p className="font-medium text-slate-800">{v}</p>{r.employee_code && <p className="text-xs text-slate-400">{r.employee_code}</p>}</div>,
     },
     {
       key: 'consumable_name', header: 'Item',

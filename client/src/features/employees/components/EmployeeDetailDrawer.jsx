@@ -181,8 +181,8 @@ const EmployeeDetailDrawer = ({ employee, isOpen, onClose, onUpdate }) => {
             <p className="text-sm text-slate-500 mt-0.5">
               {employee.designation || '—'} {employee.division ? `· ${employee.division}` : ''}
             </p>
-            {employee.employee_id && (
-              <p className="text-xs text-slate-400 mt-0.5 font-mono">{employee.employee_id}</p>
+            {employee.employee_code && (
+              <p className="text-xs text-slate-400 mt-0.5 font-mono">{employee.employee_code}</p>
             )}
           </div>
         </div>
@@ -192,7 +192,7 @@ const EmployeeDetailDrawer = ({ employee, isOpen, onClose, onUpdate }) => {
         {/* Details tab */}
         {tab === 'details' && (
           <div>
-            <InfoRow label="Employee ID" value={employee.employee_id} />
+            <InfoRow label="Employee Code" value={employee.employee_code} />
             <InfoRow label="Full Name" value={employee.name} />
             <InfoRow label="Division" value={employee.division} />
             <InfoRow label="Designation" value={employee.designation} />
@@ -263,7 +263,7 @@ const EmployeeDetailDrawer = ({ employee, isOpen, onClose, onUpdate }) => {
           formId="employee-edit-form"
           isEdit
           defaultValues={{
-            employee_id: employee.employee_id || '',
+            employee_code: employee.employee_code || '',
             name: employee.name || '',
             division: employee.division || '',
             designation: employee.designation || '',

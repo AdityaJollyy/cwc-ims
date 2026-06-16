@@ -13,7 +13,7 @@ const getEmployeeAssets = async () => {
   const result = await query(`
     SELECT
       e.id AS employee_uuid,
-      e.employee_id,
+      e.employee_code,
       e.name AS employee_name,
       e.division,
       e.designation,
@@ -97,7 +97,7 @@ const getAssetStatusReport = async ({ category_id, status } = {}) => {
       a.*,
       c.name AS category_name,
       emp.name AS assigned_to_name,
-      emp.employee_id AS assigned_to_employee_id
+      emp.employee_code AS assigned_to_employee_code
      FROM assets a
      LEFT JOIN categories c ON c.id = a.category_id
      LEFT JOIN assignments asg ON asg.asset_id = a.id AND asg.is_active = true
@@ -148,7 +148,7 @@ const getAssignmentHistory = async ({ from_date, to_date, employee_id } = {}) =>
       a.remarks,
       a.return_remarks,
       e.name AS employee_name,
-      e.employee_id AS employee_code,
+      e.employee_code,
       e.division,
       e.designation,
       ast.product_name,

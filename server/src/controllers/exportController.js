@@ -15,7 +15,7 @@ const exportEmployees = asyncHandler(async (req, res) => {
   const employees = await reportService.getEmployeeAssets();
 
   const columns = [
-    { header: 'Employee ID', key: 'employee_id', width: 15 },
+    { header: 'Employee Code', key: 'employee_code', width: 15 },
     { header: 'Name', key: 'employee_name', width: 30 },
     { header: 'Division', key: 'division', width: 20 },
     { header: 'Designation', key: 'designation', width: 25 },
@@ -27,7 +27,7 @@ const exportEmployees = asyncHandler(async (req, res) => {
   const rows = employees.map((emp) => {
     const assignedAssets = Array.isArray(emp.assigned_assets) ? emp.assigned_assets : [];
     return {
-      employee_id: emp.employee_id || '',
+      employee_code: emp.employee_code || '',
       employee_name: emp.employee_name || '',
       division: emp.division || '',
       designation: emp.designation || '',
@@ -57,7 +57,7 @@ const exportAssets = asyncHandler(async (req, res) => {
     { header: 'Asset Number', key: 'asset_number', width: 20 },
     { header: 'Status', key: 'status', width: 15 },
     { header: 'Assigned To', key: 'assigned_to_name', width: 25 },
-    { header: 'Employee ID', key: 'assigned_to_employee_id', width: 15 },
+    { header: 'Employee Code', key: 'assigned_to_employee_code', width: 15 },
     { header: 'Purchase Date', key: 'purchase_date', width: 15 },
     { header: 'Warranty Expiry', key: 'warranty_expiry', width: 15 },
     { header: 'Remarks', key: 'remarks', width: 30 },
@@ -71,7 +71,7 @@ const exportAssets = asyncHandler(async (req, res) => {
     asset_number: asset.asset_number || '',
     status: asset.status || '',
     assigned_to_name: asset.assigned_to_name || '',
-    assigned_to_employee_id: asset.assigned_to_employee_id || '',
+    assigned_to_employee_code: asset.assigned_to_employee_code || '',
     purchase_date: asset.purchase_date
       ? new Date(asset.purchase_date).toLocaleDateString('en-IN')
       : '',
@@ -95,7 +95,7 @@ const exportAssignments = asyncHandler(async (req, res) => {
 
   const columns = [
     { header: 'Employee Name', key: 'employee_name', width: 30 },
-    { header: 'Employee ID', key: 'employee_code', width: 15 },
+    { header: 'Employee Code', key: 'employee_code', width: 15 },
     { header: 'Division', key: 'division', width: 20 },
     { header: 'Designation', key: 'designation', width: 25 },
     { header: 'Product Name', key: 'product_name', width: 30 },

@@ -42,7 +42,7 @@ const findAll = async ({ employee_id, asset_id, is_active, limit, offset }) => {
     SELECT
       a.*,
       e.name AS employee_name,
-      e.employee_id AS employee_code,
+      e.employee_code,
       e.division AS employee_division,
       ast.product_name,
       ast.model,
@@ -76,7 +76,7 @@ const findById = async (id) => {
     `SELECT
       a.*,
       e.name AS employee_name,
-      e.employee_id AS employee_code,
+      e.employee_code,
       e.designation AS employee_designation,
       ast.product_name,
       ast.model,
@@ -183,7 +183,7 @@ const getHistory = async ({ search, employee_id, category_id, limit, offset }) =
     SELECT
       a.*,
       e.name AS employee_name,
-      e.employee_id AS employee_code,
+      e.employee_code,
       ast.product_name,
       ast.model,
       ast.serial_number,

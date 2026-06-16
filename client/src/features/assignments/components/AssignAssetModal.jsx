@@ -141,7 +141,7 @@ const AssignAssetModal = ({ isOpen, onClose }) => {
   const employeeOptions = (employeesData?.employees || []).map(e => ({
     value: String(e.id),
     label: e.name,
-    sublabel: [e.employee_id, e.division].filter(Boolean).join(' · '),
+    sublabel: [e.employee_code, e.division].filter(Boolean).join(' · '),
   }))
 
   const assetOptions = (assetsData?.assets || []).map(a => ({

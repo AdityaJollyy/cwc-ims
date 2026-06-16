@@ -36,7 +36,7 @@ const findAll = async ({ search, category_id, status, limit, offset }) => {
       a.*,
       c.name AS category_name,
       emp.name AS assigned_to_name,
-      emp.employee_id AS assigned_to_employee_id,
+      emp.employee_code AS assigned_to_employee_code,
       COUNT(*) OVER() AS total_count
     FROM assets a
     LEFT JOIN categories c ON c.id = a.category_id
@@ -63,7 +63,7 @@ const findById = async (id) => {
       asg.assigned_at,
       emp.id AS assigned_employee_id,
       emp.name AS assigned_to_name,
-      emp.employee_id AS assigned_to_employee_id,
+      emp.employee_code AS assigned_to_employee_code,
       emp.designation AS assigned_to_designation
      FROM assets a
      LEFT JOIN categories c ON c.id = a.category_id

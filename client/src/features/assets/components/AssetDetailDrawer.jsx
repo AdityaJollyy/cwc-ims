@@ -225,7 +225,7 @@ const AssetDetailDrawer = ({ asset, isOpen, onClose, onUpdated }) => {
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-slate-800">{detail.assigned_to_name}</p>
-                          <p className="text-xs text-slate-500 font-mono">{detail.assigned_to_employee_id}</p>
+                          <p className="text-xs text-slate-500 font-mono">{detail.assigned_to_employee_code || '—'}</p>
                           {detail.assigned_at && (
                             <p className="text-xs text-slate-400 mt-0.5">Since {formatDate(detail.assigned_at)}</p>
                           )}
@@ -233,7 +233,7 @@ const AssetDetailDrawer = ({ asset, isOpen, onClose, onUpdated }) => {
                       </div>
                     </div>
                     <InfoRow label="Employee" value={detail.assigned_to_name} />
-                    <InfoRow label="Employee ID" value={detail.assigned_to_employee_id} />
+                    <InfoRow label="Employee Code" value={detail.assigned_to_employee_code} />
                     <InfoRow label="Designation" value={detail.assigned_to_designation} />
                     <InfoRow label="Assigned At" value={formatDate(detail.assigned_at)} />
                     <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-lg text-xs text-amber-700">

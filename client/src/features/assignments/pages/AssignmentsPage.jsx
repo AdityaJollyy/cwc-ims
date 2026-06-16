@@ -71,7 +71,7 @@ const AssignModal = ({ isOpen, onClose, onSuccess }) => {
           <label className="text-sm font-medium text-slate-700">Employee <span className="text-red-500">*</span></label>
           <select value={form.employee_id} onChange={e => setForm(f => ({ ...f, employee_id: e.target.value }))} className={inputCls}>
             <option value="">Select employee...</option>
-            {(employees || []).map(e => <option key={e.id} value={e.id}>{e.name} ({e.employee_id})</option>)}
+            {(employees || []).map(e => <option key={e.id} value={e.id}>{e.name}{e.employee_code ? ` (${e.employee_code})` : ''}</option>)}
           </select>
         </div>
 
@@ -221,7 +221,7 @@ const AssignmentsPage = () => {
   }
 
   const activeColumns = [
-    { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium text-slate-800">{v}</p><p className="text-xs text-slate-400">{r.employee_code}</p></div> },
+    { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium text-slate-800">{v}</p>{r.employee_code && <p className="text-xs text-slate-400">{r.employee_code}</p>}</div> },
     { key: 'product_name', header: 'Asset', render: (_, r) => <div><p className="font-medium text-slate-800">{r.product_name || r.category_name}</p>{r.serial_number && <p className="font-mono text-xs text-slate-500">{r.serial_number}</p>}</div> },
     { key: 'assigned_at', header: 'Assigned Date', render: (v) => formatDate(v) },
     { key: 'days_active', header: 'Days Active', render: (_, row) => <span className="font-medium">{getDaysActive(row.assigned_at)}d</span> },
@@ -236,7 +236,7 @@ const AssignmentsPage = () => {
   ]
 
   const historyColumns = [
-    { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium">{v}</p><p className="text-xs text-slate-400">{r.employee_code}</p></div> },
+    { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium">{v}</p>{r.employee_code && <p className="text-xs text-slate-400">{r.employee_code}</p>}</div> },
     { key: 'product_name', header: 'Asset', render: (_, r) => <div><p className="font-medium text-slate-800">{r.product_name || r.category_name}</p>{r.serial_number && <p className="font-mono text-xs text-slate-500">{r.serial_number}</p>}</div> },
     { key: 'assigned_at', header: 'Assigned', render: (v) => formatDate(v) },
     { key: 'returned_at', header: 'Returned', render: (v) => v ? formatDate(v) : <span className="text-indigo-600 text-xs font-medium">Active</span> },

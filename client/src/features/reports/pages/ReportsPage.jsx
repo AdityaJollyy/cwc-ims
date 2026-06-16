@@ -53,7 +53,7 @@ const EmployeeAssetsTab = () => {
   }
 
   const columns = [
-    { key: 'employee_id', header: 'Employee ID', render: v => <span className="font-mono text-xs font-medium text-indigo-600">{v}</span> },
+    { key: 'employee_code', header: 'Employee Code', render: v => v ? <span className="font-mono text-xs font-medium text-indigo-600">{v}</span> : '—' },
     { key: 'name', header: 'Name', render: v => <span className="font-medium">{v}</span> },
     { key: 'division', header: 'Division', render: v => v || '—' },
     { key: 'designation', header: 'Designation', render: v => v || '—' },
@@ -166,7 +166,7 @@ const AssignmentHistoryTab = () => {
   }
 
   const columns = [
-    { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium">{v}</p><p className="text-xs text-slate-400">{r.employee_id_code}</p></div> },
+    { key: 'employee_name', header: 'Employee', render: (v, r) => <div><p className="font-medium">{v}</p><p className="text-xs text-slate-400">{r.employee_code || '—'}</p></div> },
     { key: 'asset_id', header: 'Asset', render: (_, r) => <div><p className="font-medium text-slate-800">{r.product_name || r.category_name || '—'}</p>{r.serial_number && <p className="font-mono text-xs text-slate-500">{r.serial_number}</p>}</div> },
     { key: 'assigned_at', header: 'Assigned', render: v => formatDate(v) },
     { key: 'returned_at', header: 'Returned', render: v => v ? formatDate(v) : <span className="text-indigo-600 text-xs font-medium">Active</span> },
