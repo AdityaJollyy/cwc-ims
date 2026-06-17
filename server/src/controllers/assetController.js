@@ -8,6 +8,7 @@ const assetService = require('../services/assetService');
 
 /** GET /api/assets */
 const getAllAssets = asyncHandler(async (req, res) => {
+  console.log('[assets] GET /api/assets query =', req.query);
   const result = await assetService.getAll(req.query);
   sendSuccess(res, result.assets, 'Assets retrieved successfully', 200, result.meta);
 });

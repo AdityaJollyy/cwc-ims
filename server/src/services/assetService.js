@@ -10,12 +10,20 @@ const ApiError = require('../utils/ApiError');
 
 const getAll = async (queryParams) => {
   const { page, limit, offset } = parsePagination(queryParams);
-  const { search, category_id, status } = queryParams;
+  const { search, category_id, status, age_min, age_max } = queryParams;
+
+  const parseAge = (v) => {
+    if (v === undefined || v === null || v === '') return undefined;
+    const n = parseInt(v, 10);
+    return Number.isFinite(n) && n >= 0 ? n : undefined;
+  };
 
   const { rows, total } = await assetRepository.findAll({
     search,
     category_id: category_id ? parseInt(category_id, 10) : undefined,
     status,
+    age_min: parseAge(age_min),
+    age_max: parseAge(age_max),
     limit,
     offset,
   });

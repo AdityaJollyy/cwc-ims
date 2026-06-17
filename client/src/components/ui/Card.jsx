@@ -1,4 +1,4 @@
-const Card = ({ children, className = '', padding = 'md', shadow = true }) => {
+const Card = ({ children, className = '', padding = 'md', shadow = true, onClick }) => {
   const paddings = {
     none: '',
     sm: 'p-4',
@@ -7,12 +7,15 @@ const Card = ({ children, className = '', padding = 'md', shadow = true }) => {
   }
 
   return (
-    <div className={[
-      'bg-white rounded-xl border border-slate-200',
-      shadow ? 'shadow-sm' : '',
-      paddings[padding],
-      className,
-    ].join(' ')}>
+    <div
+      onClick={onClick}
+      className={[
+        'bg-white rounded-xl border border-slate-200',
+        shadow ? 'shadow-sm' : '',
+        paddings[padding],
+        className,
+      ].join(' ')}
+    >
       {children}
     </div>
   )

@@ -6,7 +6,7 @@ const { query } = require('../config/database');
  * Assets are identified by UUID (id) only — no human-facing code column.
  */
 
-const findAll = async ({ search, category_id, status, limit, offset }) => {
+const findAll = async ({ search, category_id, status, age_min, age_max, limit, offset }) => {
   const conditions = [];
   const params = [];
 
@@ -26,6 +26,25 @@ const findAll = async ({ search, category_id, status, limit, offset }) => {
   if (status) {
     params.push(status);
     conditions.push(`a.status = $${params.length}`);
+  }
+
+  // Age filter — based on purchase_date, falling back to created_at for assets
+  // that don't yet have a purchase date recorded. Age is in whole years.
+  //   age_min = N : asset is at least N years old
+  //   age_max = N : asset is less than N+1 years old
+  // EXTRACT(YEAR FROM AGE(...)) yields the integer year-difference between
+  // today and the reference date — same number a human would compute.
+  if (age_min !== undefined && age_min !== null) {
+    params.push(age_min);
+    conditions.push(
+      `EXTRACT(YEAR FROM AGE(CURRENT_DATE, COALESCE(a.purchase_date, a.created_at))) >= $${params.length}::INT`
+    );
+  }
+  if (age_max !== undefined && age_max !== null) {
+    params.push(age_max);
+    conditions.push(
+      `EXTRACT(YEAR FROM AGE(CURRENT_DATE, COALESCE(a.purchase_date, a.created_at))) <= $${params.length}::INT`
+    );
   }
 
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -48,6 +67,9 @@ const findAll = async ({ search, category_id, status, limit, offset }) => {
   `;
 
   const result = await query(sql, params);
+  if (age_min !== undefined || age_max !== undefined) {
+    console.log('[assets] age filter applied — age_min=%s age_max=%s, returned %d rows', age_min, age_max, result.rows.length);
+  }
   const total = result.rows.length > 0 ? parseInt(result.rows[0].total_count, 10) : 0;
   const rows = result.rows.map(({ total_count, ...row }) => row);
 
@@ -122,6 +144,10 @@ const update = async (id, fields) => {
       let value = fields[field];
       if (field === 'custom_fields' && value && typeof value === 'object') {
         value = JSON.stringify(value);
+      } else if (value === '') {
+        // Empty string from the form means "cleared" — Postgres rejects "" for
+        // date/uuid columns, so normalize to NULL for all nullable fields.
+        value = null;
       }
       params.push(value);
       setClauses.push(`${field} = $${params.length}`);

@@ -5,6 +5,9 @@ const { query } = require('../config/database');
  * Aggregation queries for the dashboard overview
  */
 
+// Assets older than this many years are considered to need maintenance.
+const MAINTENANCE_AGE_YEARS = 5;
+
 /**
  * Get system-wide statistics in a single efficient query set
  * @returns {Object}
@@ -15,6 +18,7 @@ const getStats = async () => {
     assetResult,
     consumableResult,
     lowStockResult,
+    maintenanceResult,
   ] = await Promise.all([
     // Total active (non-archived) employees
     query(`SELECT COUNT(*) AS total_employees FROM employees WHERE is_archived = false`),
@@ -40,6 +44,17 @@ const getStats = async () => {
       FROM consumables
       WHERE (current_stock - damaged_quantity) < 10
     `),
+
+    // Assets older than the maintenance threshold (excluding retired).
+    // Uses purchase_date when available, falling back to created_at — keeps
+    // results consistent with the Assets page age filter.
+    query(
+      `SELECT COUNT(*) AS needs_maintenance
+       FROM assets
+       WHERE EXTRACT(YEAR FROM AGE(CURRENT_DATE, COALESCE(purchase_date, created_at))) >= $1::INT
+         AND status <> 'retired'`,
+      [MAINTENANCE_AGE_YEARS]
+    ),
   ]);
 
   const assets = assetResult.rows[0];
@@ -54,6 +69,42 @@ const getStats = async () => {
     retiredAssets:     parseInt(assets.retired_assets, 10),
     totalConsumables:  parseInt(consumableResult.rows[0].total_consumables, 10),
     lowStockItems:     parseInt(lowStockResult.rows[0].low_stock_items, 10),
+    needsMaintenance:  parseInt(maintenanceResult.rows[0].needs_maintenance, 10),
+    maintenanceAgeYears: MAINTENANCE_AGE_YEARS,
+  };
+};
+
+/**
+ * List assets older than the maintenance threshold (>5 years, excluding retired).
+ * Used by the dashboard "Needs Maintenance" alert modal.
+ * @returns {Object[]}
+ */
+const getMaintenanceAlertAssets = async () => {
+  const result = await query(
+    `SELECT
+       a.id,
+       a.product_name,
+       a.model,
+       a.serial_number,
+       a.asset_number,
+       a.status,
+       a.purchase_date,
+       a.created_at,
+       c.name AS category_name,
+       emp.name AS assigned_to_name,
+       emp.employee_code AS assigned_to_employee_code
+     FROM assets a
+     LEFT JOIN categories c ON c.id = a.category_id
+     LEFT JOIN assignments asg ON asg.asset_id = a.id AND asg.is_active = true
+     LEFT JOIN employees emp ON emp.id = asg.employee_id
+     WHERE EXTRACT(YEAR FROM AGE(CURRENT_DATE, COALESCE(a.purchase_date, a.created_at))) >= $1::INT
+       AND a.status <> 'retired'
+     ORDER BY COALESCE(a.purchase_date, a.created_at) ASC`,
+    [MAINTENANCE_AGE_YEARS]
+  );
+  return {
+    thresholdYears: MAINTENANCE_AGE_YEARS,
+    assets: result.rows,
   };
 };
 
@@ -88,4 +139,4 @@ const getRecentActivity = async (limit = 10) => {
   return result.rows;
 };
 
-module.exports = { getStats, getRecentActivity };
+module.exports = { getStats, getRecentActivity, getMaintenanceAlertAssets };

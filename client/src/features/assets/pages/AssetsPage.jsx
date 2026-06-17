@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { assetApi } from '../../../api/assetApi'
 import { categoryApi } from '../../../api/categoryApi'
@@ -25,6 +25,33 @@ const STATUS_TABS = [
   { id: 'retired', label: 'Retired' },
 ]
 
+// Age buckets — value encodes age_min/age_max sent to the API.
+//   any        → no age filter
+//   exact-N    → age_min = age_max = N (the asset is between N and N+1 years old)
+//   gte-N      → age_min = N (the asset is at least N years old)
+const AGE_OPTIONS = [
+  { value: 'any',     label: 'Any age' },
+  { value: 'exact-0', label: 'Less than 1 year old' },
+  { value: 'exact-1', label: '1 to 2 years old' },
+  { value: 'exact-2', label: '2 to 3 years old' },
+  { value: 'exact-3', label: '3 to 4 years old' },
+  { value: 'exact-4', label: '4 to 5 years old' },
+  { value: 'gte-5',   label: 'Over 5 years old (maintenance due)' },
+]
+
+const ageFilterToParams = (val) => {
+  if (!val || val === 'any') return { age_min: undefined, age_max: undefined }
+  if (val.startsWith('exact-')) {
+    const n = parseInt(val.slice(6), 10)
+    return Number.isFinite(n) ? { age_min: n, age_max: n } : { age_min: undefined, age_max: undefined }
+  }
+  if (val.startsWith('gte-')) {
+    const n = parseInt(val.slice(4), 10)
+    return Number.isFinite(n) ? { age_min: n, age_max: undefined } : { age_min: undefined, age_max: undefined }
+  }
+  return { age_min: undefined, age_max: undefined }
+}
+
 const AssetsPage = () => {
   const toast = useToast()
   const queryClient = useQueryClient()
@@ -32,16 +59,52 @@ const AssetsPage = () => {
   const drawerDisclosure = useDisclosure()
 
   const [selectedAsset, setSelectedAsset] = useState(null)
-  const [filters, setFilters] = useState({ search: '', category_id: '', status: '', page: 1, limit: 25 })
+  const [filters, setFilters] = useState({
+    search: '',
+    category_id: '',
+    status: '',
+    age: 'any',
+    page: 1,
+    limit: 25,
+  })
+
+  // Honor ?age_min=N from deep links (e.g. dashboard "View in Assets" link).
+  // Maps to the matching AGE_OPTIONS bucket. Runs once on mount.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const sp = new URLSearchParams(window.location.search)
+    const ageMinParam = sp.get('age_min')
+    if (ageMinParam == null) return
+    const n = parseInt(ageMinParam, 10)
+    if (Number.isFinite(n) && n >= 0) {
+      const bucket = n >= 5 ? `gte-${n}` : `exact-${n}`
+      if (AGE_OPTIONS.some(o => o.value === bucket)) {
+        setFilters(f => ({ ...f, age: bucket, page: 1 }))
+      }
+    }
+    // Strip the param so refresh/back doesn't re-apply unexpectedly.
+    sp.delete('age_min')
+    const newSearch = sp.toString()
+    const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '') + window.location.hash
+    window.history.replaceState(null, '', newUrl)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoryApi.getAll().then(r => r.data.data),
   })
 
+  // Translate the age bucket to the api shape (age_min / age_max)
+  // and drop the bucket key — the server doesn't know about it.
+  const apiParams = (() => {
+    const { age, ...rest } = filters
+    return { ...rest, ...ageFilterToParams(age) }
+  })()
+
   const { data, isLoading } = useQuery({
-    queryKey: ['assets', filters],
-    queryFn: () => assetApi.getAll(filters).then(r => r.data),
+    queryKey: ['assets', apiParams],
+    queryFn: () => assetApi.getAll(apiParams).then(r => r.data),
     keepPreviousData: true,
   })
 
@@ -122,7 +185,7 @@ const AssetsPage = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-5">
+      <div className="flex flex-wrap gap-3 mb-5 items-end">
         <SearchInput
           value={filters.search}
           onChange={(v) => setFilter('search', v)}
@@ -136,6 +199,22 @@ const AssetsPage = () => {
           placeholder="All Categories"
           className="w-48"
         />
+        <Select
+          value={filters.age}
+          onChange={(e) => setFilter('age', e.target.value)}
+          options={AGE_OPTIONS}
+          placeholder=""
+          className="w-56"
+        />
+        {filters.age && filters.age !== 'any' && (
+          <button
+            type="button"
+            onClick={() => setFilter('age', 'any')}
+            className="h-9 px-3 text-xs font-medium text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
+          >
+            Clear age filter
+          </button>
+        )}
       </div>
 
       <DataTable

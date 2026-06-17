@@ -1,30 +1,49 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { dashboardApi } from '../../../api/dashboardApi'
 import { consumableApi } from '../../../api/consumableApi'
 import Card from '../../../components/ui/Card'
 import Badge from '../../../components/ui/Badge'
+import Modal from '../../../components/ui/Modal'
+import Button from '../../../components/ui/Button'
+import { Spinner } from '../../../components/ui/Loader'
 import { formatDate, formatRelativeDate } from '../../../utils/formatters'
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
-const StatCard = ({ label, value, icon, iconBg, sub, subIcon }) => (
-  <Card className="flex items-start gap-4" padding="md">
-    <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
-      {icon}
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">{label}</p>
-      <p className="text-2xl font-bold text-slate-800 leading-none">
-        {value ?? <span className="skeleton inline-block w-10 h-6 rounded" />}
-      </p>
-      {sub && (
-        <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-1">
-          {subIcon}
-          {sub}
+const StatCard = ({ label, value, icon, iconBg, sub, subIcon, onClick, accent }) => {
+  const clickable = typeof onClick === 'function'
+  return (
+    <Card
+      className={[
+        'flex items-start gap-4 transition-all',
+        clickable ? 'cursor-pointer hover:shadow-md hover:-translate-y-0.5' : '',
+        accent === 'danger' ? 'ring-1 ring-red-200' : '',
+      ].join(' ')}
+      padding="md"
+      onClick={clickable ? onClick : undefined}
+    >
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
+        {icon}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">{label}</p>
+        <p className={[
+          'text-2xl font-bold leading-none',
+          accent === 'danger' ? 'text-red-600' : 'text-slate-800',
+        ].join(' ')}>
+          {value ?? <span className="skeleton inline-block w-10 h-6 rounded" />}
         </p>
-      )}
-    </div>
-  </Card>
-)
+        {sub && (
+          <p className="text-xs text-slate-500 mt-1.5 flex items-center gap-1">
+            {subIcon}
+            {sub}
+          </p>
+        )}
+      </div>
+    </Card>
+  )
+}
 
 // ─── Skeleton Stat Card ───────────────────────────────────────────────────────
 const StatCardSkeleton = () => (
@@ -45,6 +64,9 @@ const activityTypeConfig = {
 
 // ─── Dashboard Page ───────────────────────────────────────────────────────────
 const DashboardPage = () => {
+  const navigate = useNavigate()
+  const [maintenanceOpen, setMaintenanceOpen] = useState(false)
+
   const { data: stats, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => dashboardApi.getStats().then(r => r.data.data),
@@ -58,6 +80,12 @@ const DashboardPage = () => {
   const { data: consumables } = useQuery({
     queryKey: ['consumables-dashboard'],
     queryFn: () => consumableApi.getAll({ limit: 200 }).then(r => r.data.data),
+  })
+
+  const { data: maintenance, isLoading: maintenanceLoading } = useQuery({
+    queryKey: ['dashboard-maintenance-alerts'],
+    queryFn: () => dashboardApi.getMaintenanceAlerts().then(r => r.data.data),
+    enabled: maintenanceOpen,
   })
 
   // consumables comes back as the array directly (from r.data.data)
@@ -143,6 +171,22 @@ const DashboardPage = () => {
       ),
       sub: 'Being serviced',
     },
+    {
+      label: 'Needs Maintenance',
+      value: stats?.needsMaintenance,
+      iconBg: 'bg-red-100',
+      accent: 'danger',
+      icon: (
+        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+            d="M3 21l3.5-3.5m0 0L10 14m-3.5 3.5L3 14m3.5 3.5L10 21M14 3l7 7-3 3-7-7 3-3zM5 13l3-3 7 7-3 3-7-7z" />
+        </svg>
+      ),
+      sub: stats
+        ? `Older than ${stats.maintenanceAgeYears ?? 5} years`
+        : null,
+      onClick: stats?.needsMaintenance > 0 ? () => setMaintenanceOpen(true) : undefined,
+    },
   ]
 
   return (
@@ -156,7 +200,7 @@ const DashboardPage = () => {
       {/* Stat Cards Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {statsLoading
-          ? Array.from({ length: 6 }).map((_, i) => <StatCardSkeleton key={i} />)
+          ? Array.from({ length: 7 }).map((_, i) => <StatCardSkeleton key={i} />)
           : statCards.map((card) => <StatCard key={card.label} {...card} />)
         }
       </div>
@@ -199,9 +243,7 @@ const DashboardPage = () => {
             <h2 className="text-sm font-semibold text-slate-800">Recent Activity</h2>
             <p className="text-xs text-slate-500 mt-0.5">Latest assignment and return actions</p>
           </div>
-        </div>
-
-        {activityLoading ? (
+        </div>        {activityLoading ? (
           <div className="divide-y divide-slate-100">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4 px-5 py-3.5">
@@ -260,6 +302,99 @@ const DashboardPage = () => {
           </div>
         )}
       </Card>
+
+      {/* Maintenance Alert Modal */}
+      <Modal
+        isOpen={maintenanceOpen}
+        onClose={() => setMaintenanceOpen(false)}
+        title={`Assets Needing Maintenance${
+          stats?.needsMaintenance != null ? ` (${stats.needsMaintenance})` : ''
+        }`}
+        size="lg"
+        footer={
+          <Button variant="secondary" size="sm" onClick={() => setMaintenanceOpen(false)}>
+            Close
+          </Button>
+        }
+      >
+        <div>
+          <div className="flex items-start gap-3 px-4 py-3 mb-4 bg-red-50 border border-red-100 rounded-lg">
+            <svg className="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <div className="text-sm text-red-800">
+              These assets are older than{' '}
+              <strong>{maintenance?.thresholdYears ?? stats?.maintenanceAgeYears ?? 5} years</strong>{' '}
+              based on their purchase date (or date added, when no purchase date is set).
+              Consider scheduling preventive maintenance or planning replacements.
+            </div>
+          </div>
+
+          {maintenanceLoading ? (
+            <div className="flex justify-center py-12"><Spinner /></div>
+          ) : !maintenance?.assets?.length ? (
+            <div className="flex flex-col items-center justify-center py-10 text-slate-400">
+              <p className="text-sm">No assets need maintenance.</p>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-lg border border-slate-200">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600">
+                  <tr>
+                    <th className="text-left font-medium px-3 py-2">Product</th>
+                    <th className="text-left font-medium px-3 py-2">Category</th>
+                    <th className="text-left font-medium px-3 py-2">Serial / Asset No.</th>
+                    <th className="text-left font-medium px-3 py-2">Purchase Date</th>
+                    <th className="text-left font-medium px-3 py-2">Age</th>
+                    <th className="text-left font-medium px-3 py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {maintenance.assets.map((a) => {
+                    const refDate = a.purchase_date || a.created_at
+                    const refMs = refDate ? new Date(refDate).getTime() : null
+                    const ageYears = refMs
+                      ? Math.floor((Date.now() - refMs) / (1000 * 60 * 60 * 24 * 365.25))
+                      : null
+                    return (
+                      <tr key={a.id} className="hover:bg-slate-50">
+                        <td className="px-3 py-2 text-slate-800 font-medium">
+                          {a.product_name || <span className="text-slate-400">—</span>}
+                          {a.model && <span className="text-xs text-slate-500 ml-1">({a.model})</span>}
+                        </td>
+                        <td className="px-3 py-2 text-slate-600">{a.category_name || '—'}</td>
+                        <td className="px-3 py-2 text-slate-600 font-mono text-xs">
+                          {a.serial_number || a.asset_number || '—'}
+                        </td>
+                        <td className="px-3 py-2 text-slate-600">{formatDate(a.purchase_date)}</td>
+                        <td className="px-3 py-2">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-red-50 text-red-700 ring-1 ring-red-200 text-xs font-medium">
+                            {ageYears != null ? `${ageYears} yr${ageYears === 1 ? '' : 's'}` : '—'}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2"><Badge status={a.status} /></td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+              <div className="flex justify-end px-3 py-2 bg-slate-50 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMaintenanceOpen(false)
+                    navigate(`/assets?age_min=${maintenance?.thresholdYears ?? 5}`)
+                  }}
+                  className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+                >
+                  View in Assets page →
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   )
 }

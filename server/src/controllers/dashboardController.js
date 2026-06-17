@@ -19,4 +19,10 @@ const getRecentActivity = asyncHandler(async (req, res) => {
   sendSuccess(res, activity, 'Recent activity retrieved');
 });
 
-module.exports = { getStats, getRecentActivity };
+/** GET /api/dashboard/maintenance-alerts */
+const getMaintenanceAlerts = asyncHandler(async (req, res) => {
+  const result = await dashboardService.getMaintenanceAlerts();
+  sendSuccess(res, result, 'Maintenance alerts retrieved');
+});
+
+module.exports = { getStats, getRecentActivity, getMaintenanceAlerts };

@@ -21,4 +21,12 @@ const getRecentActivity = async (limit = 10) => {
   return dashboardRepository.getRecentActivity(limit);
 };
 
-module.exports = { getStats, getRecentActivity };
+/**
+ * Get assets that need maintenance (older than 5 years, excluding retired)
+ * @returns {{ thresholdYears: number, assets: Object[] }}
+ */
+const getMaintenanceAlerts = async () => {
+  return dashboardRepository.getMaintenanceAlertAssets();
+};
+
+module.exports = { getStats, getRecentActivity, getMaintenanceAlerts };
