@@ -14,6 +14,9 @@ const { createEmployeeSchema, updateEmployeeSchema } = require('../validators/em
 // GET /api/employees — list all employees (with search + filter)
 router.get('/', authenticateJWT, employeeController.getAllEmployees);
 
+// GET /api/employees/meta/divisions — get distinct division names (for dropdown)
+router.get('/meta/divisions', authenticateJWT, employeeController.getDivisions);
+
 // POST /api/employees — create a new employee
 router.post(
   '/',

@@ -10,4 +10,5 @@ export const employeeApi = {
   delete:       (id)     => api.delete(`/employees/${id}`),
   getAssignments: (id)   => api.get(`/employees/${id}/assignments`),
   getHistory:   (id)     => api.get(`/employees/${id}/history`),
+  getDivisions: ()       => api.get('/employees/meta/divisions'),
 }

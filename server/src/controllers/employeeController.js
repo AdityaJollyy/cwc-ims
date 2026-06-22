@@ -88,6 +88,15 @@ const deleteEmployee = asyncHandler(async (req, res) => {
   sendSuccess(res, null, 'Employee deleted successfully');
 });
 
+/**
+ * GET /api/employees/meta/divisions
+ * Return distinct non-empty division values (active employees only)
+ */
+const getDivisions = asyncHandler(async (req, res) => {
+  const divisions = await employeeService.getDivisions();
+  sendSuccess(res, divisions, 'Divisions retrieved successfully');
+});
+
 module.exports = {
   getAllEmployees,
   getEmployee,
@@ -98,4 +107,5 @@ module.exports = {
   deleteEmployee,
   getEmployeeAssignments,
   getEmployeeHistory,
+  getDivisions,
 };

@@ -10,35 +10,12 @@ import Badge from "../../../components/ui/Badge";
 import Pagination from "../../../components/ui/Pagination";
 import Modal from "../../../components/ui/Modal";
 import EmptyState from "../../../components/ui/EmptyState";
-import EmployeeForm from "../components/EmployeeForm";
+import EmployeeForm, { KNOWN_DIVISIONS } from "../components/EmployeeForm";
 import EmployeeDetailDrawer from "../components/EmployeeDetailDrawer";
 import { useToast } from "../../../store/ToastContext";
 import useDisclosure from "../../../hooks/useDisclosure";
 
-const DIVISIONS = [
-  "VIGILANCE",
-  "ENGINEERING",
-  "RAIL",
-  "HINDI",
-  "PERSONNEL",
-  "CUSTOM CELL",
-  "NBP & P",
-  "Server Room, Per",
-  "Reception",
-  "Dispatch",
-  "Inspection",
-  "Internal Audit",
-  "MIS",
-  "Commercial",
-  "Finance",
-  "TECHNICAL",
-  "BNC",
-  "MD Office",
-  "DP Office",
-  "DF Office",
-  "Dir.M&CP Sectt",
-  "Dir.M&CP AM Sectt",
-];
+
 
 const EmployeesPage = () => {
   const queryClient = useQueryClient();
@@ -207,7 +184,7 @@ const EmployeesPage = () => {
           placeholder="All Divisions"
           value={filters.division}
           onChange={(e) => setFilter("division", e.target.value)}
-          options={DIVISIONS.map((d) => ({ value: d, label: d }))}
+          options={KNOWN_DIVISIONS.map((d) => ({ value: d, label: d }))}
           className="w-44"
         />
         <Select

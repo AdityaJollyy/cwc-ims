@@ -378,6 +378,7 @@ const ConsumableDetailDrawer = ({ isOpen, onClose, consumable: initialConsumable
   const [issueOpen, setIssueOpen] = useState(false)
   const [returnAssignment, setReturnAssignment] = useState(null)
   const [deleteOpen, setDeleteOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
   const [txPage, setTxPage] = useState(1)
   const [selectedTx, setSelectedTx] = useState(null)
 
@@ -416,6 +417,34 @@ const ConsumableDetailDrawer = ({ isOpen, onClose, consumable: initialConsumable
     },
   })
 
+  // ─── Edit form state ─────────────────────────────────────────────
+  const editSchema = z.object({
+    category: z.string().optional(),
+    unit: z.string().optional(),
+    remarks: z.string().optional(),
+  })
+  const { register: editRegister, handleSubmit: editHandleSubmit, reset: editReset, formState: { errors: editErrors, isSubmitting: editSubmitting } } = useForm({
+    resolver: zodResolver(editSchema),
+  })
+
+  const openEdit = () => {
+    editReset({ category: consumable.category || '', unit: consumable.unit || '', remarks: consumable.remarks || '' })
+    setEditOpen(true)
+  }
+
+  const editMutation = useMutation({
+    mutationFn: (d) => consumableApi.update(consumable.id, d),
+    onSuccess: () => {
+      toast.success('Item updated')
+      queryClient.invalidateQueries({ queryKey: ['consumables'] })
+      queryClient.invalidateQueries({ queryKey: ['consumable', consumable.id] })
+      queryClient.invalidateQueries({ queryKey: ['consumables-dashboard'] })
+      setEditOpen(false)
+      onUpdated?.()
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Update failed'),
+  })
+
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ['consumables'] })
     queryClient.invalidateQueries({ queryKey: ['consumable', consumable.id] })
@@ -445,9 +474,12 @@ const ConsumableDetailDrawer = ({ isOpen, onClose, consumable: initialConsumable
         title={consumable.name}
         width="max-w-lg"
         footer={
-          <div className="flex justify-start w-full">
+          <div className="flex justify-between w-full items-center">
             <Button variant="danger-ghost" size="sm" onClick={() => setDeleteOpen(true)}>
               Delete Item
+            </Button>
+            <Button variant="secondary" size="sm" onClick={openEdit}>
+              ✏️ Edit Details
             </Button>
           </div>
         }
@@ -615,6 +647,26 @@ const ConsumableDetailDrawer = ({ isOpen, onClose, consumable: initialConsumable
         confirmVariant="danger"
         confirmDisabled={issued > 0}
       />
+
+      {/* Edit Details Modal */}
+      <Modal
+        isOpen={editOpen}
+        onClose={() => setEditOpen(false)}
+        title={`Edit — ${consumable.name}`}
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button form="consumable-edit-form" type="submit" loading={editSubmitting || editMutation.isPending}>Save Changes</Button>
+          </>
+        }
+      >
+        <form id="consumable-edit-form" onSubmit={editHandleSubmit(d => editMutation.mutate(d))} className="flex flex-col gap-4">
+          <Input label="Category" placeholder="e.g. Peripherals, Cartridges" error={editErrors.category?.message} {...editRegister('category')} />
+          <Input label="Unit" placeholder="e.g. pieces, boxes, meters" error={editErrors.unit?.message} {...editRegister('unit')} />
+          <Textarea label="Remarks" rows={3} placeholder="Any notes..." error={editErrors.remarks?.message} {...editRegister('remarks')} />
+        </form>
+      </Modal>
     </>
   )
 }

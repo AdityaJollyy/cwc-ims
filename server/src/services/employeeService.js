@@ -148,4 +148,9 @@ const deleteEmployee = async (id) => {
   return true;
 };
 
-module.exports = { getAll, getById, create, update, archive, unarchive, deleteEmployee, getAssignments, getHistory };
+const getDivisions = async () => {
+  return employeeRepository.getDivisions();
+};
+
+module.exports = { getAll, getById, create, update, archive, unarchive, deleteEmployee, getAssignments, getHistory, getDivisions };
+
