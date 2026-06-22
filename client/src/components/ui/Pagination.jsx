@@ -14,8 +14,8 @@ const Pagination = ({ meta, onPageChange, onLimitChange }) => {
   for (let i = start; i <= end; i++) pages.push(i)
 
   return (
-    <div className="flex items-center justify-between gap-4 px-1">
-      <div className="flex items-center gap-2 text-sm text-slate-500">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-1">
+      <div className="flex items-center gap-2 text-sm text-slate-500 flex-wrap">
         <span>
           Showing {((page - 1) * limit) + 1}–{Math.min(page * limit, total)} of {total}
         </span>
@@ -30,7 +30,7 @@ const Pagination = ({ meta, onPageChange, onLimitChange }) => {
         </select>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 flex-wrap">
         <Button
           variant="ghost"
           size="sm"

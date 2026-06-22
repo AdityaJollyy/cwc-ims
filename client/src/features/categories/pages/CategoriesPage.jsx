@@ -106,7 +106,7 @@ const CategoriesPage = () => {
       />
 
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-44 skeleton rounded-xl" />)}
         </div>
       ) : !categories?.length ? (
@@ -116,7 +116,7 @@ const CategoriesPage = () => {
           action={<Button onClick={createModal.open}>Add First Category</Button>}
         />
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {categories.map(cat => (
             <CategoryCard
               key={cat.id}

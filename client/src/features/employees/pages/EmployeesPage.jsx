@@ -178,14 +178,14 @@ const EmployeesPage = () => {
           value={filters.search}
           onChange={(v) => setFilter("search", v)}
           placeholder="Search by name, code, division..."
-          className="w-72"
+          className="w-full sm:w-72"
         />
         <Select
           placeholder="All Divisions"
           value={filters.division}
           onChange={(e) => setFilter("division", e.target.value)}
           options={KNOWN_DIVISIONS.map((d) => ({ value: d, label: d }))}
-          className="w-44"
+          className="w-full sm:w-44"
         />
         <Select
           placeholder="All Status"
@@ -195,7 +195,7 @@ const EmployeesPage = () => {
             { value: "false", label: "Active" },
             { value: "true", label: "Archived" },
           ]}
-          className="w-36"
+          className="w-full sm:w-36"
         />
         {(filters.search || filters.division || filters.is_archived) && (
           <button

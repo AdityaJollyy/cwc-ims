@@ -147,7 +147,7 @@ const AssetDetailDrawer = ({ asset, isOpen, onClose, onUpdated }) => {
             >
               Delete
             </Button>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap justify-end">
               <Button
                 variant="secondary"
                 size="sm"

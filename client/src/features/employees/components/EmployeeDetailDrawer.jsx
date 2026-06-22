@@ -137,7 +137,7 @@ const EmployeeDetailDrawer = ({ employee, isOpen, onClose, onUpdate }) => {
             >
               Delete
             </Button>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap justify-end">
               {employee.is_archived ? (
                 <Button
                   variant="secondary"

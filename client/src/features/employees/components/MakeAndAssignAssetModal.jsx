@@ -251,7 +251,7 @@ const MakeAndAssignAssetModal = ({ isOpen, onClose, employee, onSuccess }) => {
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Product Name"
             placeholder="e.g. Dell Latitude 5540"
@@ -266,7 +266,7 @@ const MakeAndAssignAssetModal = ({ isOpen, onClose, employee, onSuccess }) => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Serial Number"
             placeholder="e.g. SN123456789"
@@ -281,7 +281,7 @@ const MakeAndAssignAssetModal = ({ isOpen, onClose, employee, onSuccess }) => {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Purchase Date"
             type="date"
@@ -309,7 +309,7 @@ const MakeAndAssignAssetModal = ({ isOpen, onClose, employee, onSuccess }) => {
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
                   {categories?.find((c) => String(c.id) === String(categoryId))?.name} Fields
                 </p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {customFields.map((f) => (
                     <CustomField
                       key={f.id}

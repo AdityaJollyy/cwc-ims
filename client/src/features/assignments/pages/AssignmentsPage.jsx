@@ -110,7 +110,7 @@ const AssignModal = ({ isOpen, onClose, onSuccess }) => {
           emptyMessage="No available assets"
         />
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-slate-700">Serial Number <span className="text-slate-400 text-xs">(optional)</span></label>
             <input value={form.serial_number} onChange={e => setForm(f => ({ ...f, serial_number: e.target.value }))} placeholder="Will update asset record" className={inputCls} />
@@ -326,17 +326,17 @@ const AssignmentsPage = () => {
         }
       />
 
-      <div className="flex gap-1 mb-5 bg-white border border-slate-200 rounded-xl p-1.5 w-fit shadow-sm">
+      <div className="flex gap-1 mb-5 bg-white border border-slate-200 rounded-xl p-1.5 shadow-sm overflow-x-auto no-scrollbar w-full sm:w-fit">
         {[{ id: 'active', label: 'Active Assignments' }, { id: 'history', label: 'History' }].map(tab => (
           <button key={tab.id} onClick={() => { setActiveTab(tab.id); setPage(1) }}
-            className={['px-4 py-1.5 rounded-lg text-sm font-medium transition-all', activeTab === tab.id ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'].join(' ')}>
+            className={['px-4 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap', activeTab === tab.id ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'].join(' ')}>
             {tab.label}
           </button>
         ))}
       </div>
 
       <div className="mb-4">
-        <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1) }} placeholder="Search employee or asset..." className="w-72" />
+        <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1) }} placeholder="Search employee or asset..." className="w-full sm:w-72" />
       </div>
 
       {activeTab === 'active' ? (

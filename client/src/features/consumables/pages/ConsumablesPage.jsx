@@ -485,7 +485,7 @@ const ConsumableDetailDrawer = ({ isOpen, onClose, consumable: initialConsumable
         }
       >
         {/* Stock Summary */}
-        <div className="grid grid-cols-4 gap-2 mb-5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-5">
           {[
             { label: 'In Stock', value: consumable.current_stock, color: 'text-slate-800' },
             { label: 'Issued', value: issued, color: 'text-indigo-600', hint: 'returnable, awaiting return' },
@@ -755,7 +755,7 @@ const IssuancesTab = () => {
   return (
     <>
       <div className="mb-4">
-        <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1) }} placeholder="Search employee or item..." className="w-72" />
+        <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1) }} placeholder="Search employee or item..." className="w-full sm:w-72" />
       </div>
       <DataTable columns={columns} data={items} isLoading={isLoading} emptyMessage="No active issuances" />
       {meta?.totalPages > 1 && <div className="mt-4"><Pagination meta={meta} onPageChange={setPage} /></div>}
@@ -811,10 +811,10 @@ const ConsumablesPage = () => {
         }
       />
 
-      <div className="flex gap-1 mb-5 bg-white border border-slate-200 rounded-xl p-1.5 w-fit shadow-sm">
+      <div className="flex gap-1 mb-5 bg-white border border-slate-200 rounded-xl p-1.5 shadow-sm overflow-x-auto no-scrollbar w-full sm:w-fit">
         {[{ id: 'items', label: 'Items' }, { id: 'issuances', label: 'Active Issuances' }].map(tab => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-            className={['px-4 py-1.5 rounded-lg text-sm font-medium transition-all', activeTab === tab.id ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'].join(' ')}>
+            className={['px-4 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap', activeTab === tab.id ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:bg-slate-100'].join(' ')}>
             {tab.label}
           </button>
         ))}
@@ -823,11 +823,11 @@ const ConsumablesPage = () => {
       {activeTab === 'items' && (
         <>
           <div className="mb-5">
-            <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1) }} placeholder="Search items..." className="w-72" />
+            <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1) }} placeholder="Search items..." className="w-full sm:w-72" />
           </div>
 
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-40 skeleton rounded-xl" />)}
             </div>
           ) : items.length === 0 ? (
@@ -837,7 +837,7 @@ const ConsumablesPage = () => {
               action={<Button onClick={createModal.open}>Add First Item</Button>}
             />
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {items.map(item => (
                 <ConsumableCard key={item.id} consumable={item} onClick={() => setSelectedConsumable(item)} />
               ))}

@@ -126,7 +126,7 @@ const CategoryFieldsPage = () => {
     const fieldType = watch('field_type')
     return (
       <form id={formId} onSubmit={onSubmit} className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input label="Field Key" required error={errors.field_name?.message} placeholder="e.g. ram_size" hint="lowercase, no spaces" {...register('field_name')} />
           <Input label="Display Label" required error={errors.field_label?.message} placeholder="e.g. RAM Size" {...register('field_label')} />
         </div>

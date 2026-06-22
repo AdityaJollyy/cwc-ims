@@ -123,7 +123,7 @@ const AssetForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
         )}
       />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="Product Name"
           placeholder="e.g. Dell Latitude 5540"
@@ -138,7 +138,7 @@ const AssetForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="Serial Number"
           placeholder="e.g. SN123456789"
@@ -153,7 +153,7 @@ const AssetForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="Purchase Date"
           type="date"
@@ -181,7 +181,7 @@ const AssetForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
                 {categories?.find(c => String(c.id) === String(categoryId))?.name} Fields
               </p>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {fields.map((f) => (
                   <CustomField key={f.id} field={f} register={register} errors={errors} control={control} />
                 ))}

@@ -198,7 +198,7 @@ const DashboardPage = () => {
       </div>
 
       {/* Stat Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {statsLoading
           ? Array.from({ length: 7 }).map((_, i) => <StatCardSkeleton key={i} />)
           : statCards.map((card) => <StatCard key={card.label} {...card} />)

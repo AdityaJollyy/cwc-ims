@@ -5,8 +5,8 @@ const PageHeader = ({
   backButton,
 }) => {
   return (
-    <div className="flex items-start justify-between gap-4 mb-6">
-      <div>
+    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 mb-6">
+      <div className="min-w-0">
         {backButton && (
           <div className="mb-1">{backButton}</div>
         )}
@@ -16,7 +16,7 @@ const PageHeader = ({
         )}
       </div>
       {actions && (
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 flex-wrap sm:shrink-0">
           {actions}
         </div>
       )}

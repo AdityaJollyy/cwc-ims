@@ -167,13 +167,13 @@ const AssetsPage = () => {
       />
 
       {/* Status Tabs */}
-      <div className="flex gap-1 mb-4 bg-white border border-slate-200 rounded-xl p-1.5 w-fit shadow-sm">
+      <div className="flex gap-1 mb-4 bg-white border border-slate-200 rounded-xl p-1.5 shadow-sm overflow-x-auto no-scrollbar w-full sm:w-fit">
         {STATUS_TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setFilter('status', tab.id)}
             className={[
-              'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+              'px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap',
               filters.status === tab.id
                 ? 'bg-indigo-600 text-white shadow-sm'
                 : 'text-slate-600 hover:bg-slate-100',
@@ -190,21 +190,21 @@ const AssetsPage = () => {
           value={filters.search}
           onChange={(v) => setFilter('search', v)}
           placeholder="Search by name, ID, serial..."
-          className="w-72"
+          className="w-full sm:w-72"
         />
         <Select
           value={filters.category_id}
           onChange={(e) => setFilter('category_id', e.target.value)}
           options={categoryOptions}
           placeholder="All Categories"
-          className="w-48"
+          className="w-full sm:w-48"
         />
         <Select
           value={filters.age}
           onChange={(e) => setFilter('age', e.target.value)}
           options={AGE_OPTIONS}
           placeholder=""
-          className="w-56"
+          className="w-full sm:w-56"
         />
         {filters.age && filters.age !== 'any' && (
           <button

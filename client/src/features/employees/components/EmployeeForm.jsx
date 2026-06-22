@@ -189,7 +189,7 @@ const EmployeeForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
 
   return (
     <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="Employee Code"
           placeholder="e.g. EMP001, A-23 (optional)"
@@ -206,7 +206,7 @@ const EmployeeForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Controller
           name="division"
           control={control}
@@ -226,7 +226,7 @@ const EmployeeForm = ({ formId, onSubmit, defaultValues, isEdit }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
           label="Mobile"
           placeholder="+91 98765 43210"

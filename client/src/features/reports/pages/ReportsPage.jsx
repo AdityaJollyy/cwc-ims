@@ -135,13 +135,13 @@ const AssetStatusTab = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4 gap-3">
-        <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
+        <div className="flex gap-3 flex-wrap">
           <Select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} options={[
             { value: 'available', label: 'Available' }, { value: 'assigned', label: 'Assigned' },
             { value: 'under_repair', label: 'Under Repair' }, { value: 'damaged', label: 'Damaged' }, { value: 'retired', label: 'Retired' },
-          ]} placeholder="All Statuses" className="w-44" />
-          <Select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} options={(categories || []).map(c => ({ value: c.id, label: c.name }))} placeholder="All Categories" className="w-44" />
+          ]} placeholder="All Statuses" className="w-full sm:w-44" />
+          <Select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} options={(categories || []).map(c => ({ value: c.id, label: c.name }))} placeholder="All Categories" className="w-full sm:w-44" />
         </div>
         <ExportButton onClick={handleExport} loading={exporting} />
       </div>
@@ -303,7 +303,7 @@ const BulkInventoryTransactionsTab = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 gap-3">
         <div className="flex gap-3 flex-wrap items-end">
           <div className="flex flex-col gap-1">
             <label className="text-xs text-slate-500">From</label>
@@ -313,10 +313,10 @@ const BulkInventoryTransactionsTab = () => {
             <label className="text-xs text-slate-500">To</label>
             <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} className={inputCls} />
           </div>
-          <Select value={txType} onChange={e => setTxType(e.target.value)} options={TX_TYPE_OPTIONS} placeholder="All Types" className="w-40" />
+          <Select value={txType} onChange={e => setTxType(e.target.value)} options={TX_TYPE_OPTIONS} placeholder="All Types" className="w-full sm:w-40" />
           <Select value={consumableId} onChange={e => setConsumableId(e.target.value)}
             options={(consumables || []).map(c => ({ value: c.id, label: c.name }))}
-            placeholder="All Items" className="w-52" />
+            placeholder="All Items" className="w-full sm:w-52" />
           {(fromDate || toDate || txType || consumableId) && (
             <Button variant="secondary" size="sm" onClick={() => { setFromDate(''); setToDate(''); setTxType(''); setConsumableId('') }}>
               Clear
@@ -435,7 +435,7 @@ const ReportsPage = () => {
     <div>
       <PageHeader title="Reports" subtitle="View and export comprehensive inventory reports" />
 
-      <div className="flex gap-1 flex-wrap mb-6 bg-white border border-slate-200 rounded-xl p-1.5 w-fit shadow-sm">
+      <div className="flex gap-1 flex-nowrap sm:flex-wrap mb-6 bg-white border border-slate-200 rounded-xl p-1.5 shadow-sm overflow-x-auto no-scrollbar w-full sm:w-fit">
         {TABS.map(tab => (
           <button
             key={tab.id}
