@@ -8,8 +8,8 @@ export default defineConfig({
     port: 5174,
     proxy: {
       "/api": {
-        target: "https://cwc-ims-328c.onrender.com",
-        // target: "http://localhost:3000",
+        // target: "https://cwc-ims-328c.onrender.com",
+        target: "http://localhost:3000",
         changeOrigin: true,
       },
     },
